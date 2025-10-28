@@ -1,0 +1,7 @@
+.brokers {
+    padding: 8px 12px;
+}
+
+.brokers :global(.ant-table-thead > tr > th){
+    background-color: #F5D3C4;
+}

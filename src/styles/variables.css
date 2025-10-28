@@ -1,0 +1,57 @@
+/*:root{*/
+/*    --primary-color: rgb(44, 62, 80);    !* Dark Navy Blue - Professional & Stable *!*/
+/*    --secondary-color: rgb(52, 152, 219); !* Bright Blue - Tech & Innovation *!*/
+/*    --warning-color: rgb(241, 196, 15);   !* Yellow - Alerts & Warnings *!*/
+/*    --danger-color: rgb(231, 76, 60);     !* Red - Errors & Critical Actions *!*/
+/*    --success-color: rgb(52, 152, 219);   !* Green - Success & Confirmations *!*/
+/*    --text-color: rgb(51, 51, 51);        !* Dark Gray - Readable Main Text *!*/
+/*    --text-color-light: rgb(170, 170, 170); !* Light Gray - Muted Text *!*/
+/*    --background-layout-color: rgb(236, 240, 241);*/
+/*    --backround-selected: rgb(230, 230, 230);*/
+/*    --folder-color: rgb(255, 211, 77);*/
+/*    --border: #e5e5e5;*/
+/*    --text-400:400;*/
+/*    --text-500:500;*/
+/*    --text-bold:bold;*/
+/*    --text-normal:14px;*/
+/*    --text-sm:12px;*/
+/*    --text-xs:10px;*/
+/*    --text-l:16px;*/
+
+/*}*/
+
+:root {
+    --color-primary: #2563EB;
+    --color-primary-text: #ffffff;
+    --color-background: #f8f9fa;
+    --color-card: #ffffff;
+    --color-border: #bdc3c7;
+    --color-text: #2c3e50df;
+
+    --color-success: #2ecc71;
+    --color-error: #e74c3c;
+    --color-warning: #f39c12;
+    --color-info: #3498db;
+    --font-sans: "Inter", "Roboto", "Segoe UI", sans-serif;
+    --font-mono: "Fira Code", "Source Code Pro", monospace;
+    --color-yellow: rgb(255, 211, 77);
+    --color-light-blue: #74c0fc;
+    --color-light-green: #63e6be;
+    --color-purple: #7A85C1;
+    --color-gay-green: #4FB7B3;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+    --color-primary: #1abc9c;
+    --color-primary-text: #ecf0f1;
+    --color-background: #1e1e2e;
+    --color-card: #2c3e50;
+    --color-border: #34495e;
+    --color-text: #ecf0f1;
+
+    --color-success: #27ae60;
+    --color-error: #e74c3c;
+    --color-warning: #f39c12;
+    --color-info: #3498db;
+}

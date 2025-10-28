@@ -1,0 +1,11 @@
+.database :global(.ant-table-thead > tr > th){
+    background-color: #A3CCDA;
+}
+
+.broker :global(.ant-table-thead > tr > th){
+    background-color: #D9C4B0;
+}
+
+.volume :global(.ant-table-thead > tr > th){
+    background-color: #C5B0CD;
+}

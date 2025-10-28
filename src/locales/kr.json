@@ -1,0 +1,10 @@
+{
+  "header": {
+    "title": {
+      "file": "파일",
+      "tools": "도구",
+      "action": "작업",
+      "help": "도움말"
+    }
+  }
+}

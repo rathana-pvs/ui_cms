@@ -1,0 +1,10 @@
+{
+  "header": {
+    "title": {
+      "file": "File",
+      "tools": "Tools",
+      "action": "Action",
+      "help": "Help"
+    }
+  }
+}

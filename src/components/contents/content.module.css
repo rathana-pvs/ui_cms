@@ -1,0 +1,10 @@
+.dashboard__content__menu > li{
+    background-color: var(--background-layout-color);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin: 8px 0;
+}
+
+.dashboard__content__menu{
+    border-inline-end : none !important;
+}
