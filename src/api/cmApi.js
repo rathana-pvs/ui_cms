@@ -11,32 +11,69 @@ export const requestCMAPI = (server, payload)=>{
     return axios.post(`${url}/${uid}`, payload);
 }
 
+export const revokeLogin = async (server) => {
+    try {
+        console.log("revoke login");
+        await axios.post("/api/proxy/cms-auth/login", server) // revoke session/token
+        return true
+    } catch (retryError) {
+        return false
+    }
+}
+
 export const getResponse = async (server, payload) => {
 
-    let response = null
     try{
         const {data} = await requestCMAPI(server, payload);
+        if (data.status === "failure" &&
+            data.note?.includes("invalid token")) {
+            await revokeLogin(server);
+            const {data} = await requestCMAPI(server, payload);
+            return {...data, success: data.status === "success" };
+        }
         return {...data, success: data.status === "success" };
     }catch(error){
-        console.log(error)
+
         if (error.response.status === 401) {
             console.warn("Unauthorized. Revoking auth...");
             try {
-                await axios.post("/api/proxy/cms-auth/login", server) // revoke session/token
-                console.info("Auth revoked. Retrying /host...");
+                const status = await revokeLogin(server);
+                if(status){
+                    const {data} = await requestCMAPI(server, payload);
+                    return {...data, success: data.status === "success" };
+                }
 
-                const {data} = await requestCMAPI(server, payload);
-                return {...data, success: data.status === "success" };
             } catch (retryError) {
                 console.error("Retry failed:", retryError);
                 throw retryError;
             }
 
         }
-        throw error;
+       return {status: false}
     }
 
 }
+
+export const addHostAPI = (payload)=>{
+    return axios.post("/api/proxy/host", payload).then(res => {
+        if(res.status === 201) {
+           return {status: true}
+        }
+        return false;
+    })
+}
+
+export const updateHostAPI = async (server, payload) => {
+    return axios.put(`/api/proxy/host/${server.uid}`, payload).then(res => {
+        if(res.status === 200) {
+            return {...res, status: true};
+        }
+        return false;
+
+    })
+}
+
+
 export const getHostsAPI = async () => {
     return axios.get("/api/proxy/host").then(res => {
         if(res.status === 200) {
@@ -47,6 +84,15 @@ export const getHostsAPI = async () => {
 
 }
 
+export const deleteHostAPI = async (server) => {
+    return axios.delete(`/api/proxy/host/${server.uid}`).then(res => {
+        if(res.status === 200) {
+            return {...res, status: true};
+        }
+        return false;
+
+    })
+}
 
 
 
@@ -76,5 +122,26 @@ export const getDatabasesAPI = async (server) => {
         return {result: databases, success: true};
     }
 
+    return {success: false};
+}
+
+export const getBrokersAPI = async (server) => {
+    let payload = {
+        task: "getbrokersinfo"
+    }
+    const response = await getResponse(server, payload)
+
+    return {...response, result: response.brokersinfo?.[0].broker};
+}
+
+export const getBrokerStatusAPI = async (node, data) => {
+    let payload = {
+        task: "getbrokerstatus",
+        ...data
+    }
+    const response = await getResponse(node, payload)
+    if(response.success){
+        return {result: response.asinfo, success: true};
+    }
     return {success: false};
 }

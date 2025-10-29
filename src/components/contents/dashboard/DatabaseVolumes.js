@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import { Space, Table, Tag } from 'antd';
 import {useSelector} from "react-redux";
-import {getDatabasesAPI, getResponse} from "@/api";
 import styles from '@/components/contents/dashboard/dashboard.module.css'
+import {getDatabasesAPI, getResponse} from "@/api/cmApi";
 
 const columns = [
     {
@@ -47,7 +47,7 @@ const getSizeFormat = (size)=>{
 
 
 export default function (){
-    const {selectedObject} = useSelector(state=>state.general);
+    const {activeServer} = useSelector(state=>state.treeReducer);
     const [dataSource, setDataSource] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -84,15 +84,15 @@ export default function (){
 
 
     const getSpaceInfo = async () => {
-        const resDB = await getDatabasesAPI(selectedObject);
+        const resDB = await getDatabasesAPI(activeServer);
         let permanent = "-"
         let temporary = "-"
         let activeLog = "-"
         let archiveLog = "-"
         let tempData = []
         if(resDB.success){
-            const allRequest = resDB.result.filter(res=>res.status === "active").map(res=>{
-                return getResponse(selectedObject, {
+            const allRequest = resDB.result?.filter(res=>res.status === "active").map(res=>{
+                return getResponse(activeServer, {
                     task: "dbspaceinfo",
                     dbname: res.dbname
                 })
@@ -131,11 +131,11 @@ export default function (){
     }
 
     useEffect(()=>{
-        if(selectedObject.serverId){
+        if(activeServer.uid){
             getSpaceInfo()
         }
 
-    },[selectedObject])
+    },[])
 
 
     return(

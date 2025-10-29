@@ -6,5 +6,5 @@ export const FolderIcon = ()=>{
 }
 
 export const FolderGearIcon = ({status})=>{
-    return <i className="fa-regular fa-folder-gear" style={{color:`${status ? 'var(--color-yellow)': ''}`}}/>
+    return <i className="fa-regular fa-folder-gear" style={{color:`${status ? '#B77466':'var(--color-yellow)'}`}}/>
 }

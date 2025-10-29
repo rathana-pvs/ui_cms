@@ -1,0 +1,123 @@
+
+.card__content{
+    padding: 6px 12px;
+    cursor: pointer;
+    width: 100%;
+}
+.card__color{
+    background-color: color-mix(in srgb, var(--primary-color) 15%, transparent);
+    width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card__color i{
+    font-size: 40px;
+    color: var(--primary-color);
+}
+
+.card__title{
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 14px;
+    /*border-bottom: 1px solid var(--border);*/
+    padding-bottom: 4px;
+    text-align: center;
+}
+.card__description div{
+    margin: 6px 0;
+    font-size: 12px;
+    /*opacity: 0.75;*/
+    color: var(--primary-color);
+}
+.card__description span{
+    display: inline-block;
+    width: 70px;
+    font-weight: 500;
+}
+
+.card__decor{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.card__decor svg{
+    color: var(--primary-color);
+    opacity: 0.1;
+    height: 170px;
+    position: absolute;
+    right: -4px;
+
+
+}
+
+.card__decor__secondary{
+    svg{
+        color: #3C467B;
+    }
+}
+
+.card__decor__warning{
+    svg{
+        color: var(--warning-color);
+        opacity: 0.2;
+    }
+}
+
+.card__decor__danger{
+    svg{
+        color: var(--danger-color);
+    }
+}
+
+.card__color__secondary{
+    background-color: color-mix(in srgb, var(--secondary-color) 15%, transparent);
+    i{
+        color: var(--secondary-color);
+    }
+}
+
+.card__color__warning{
+    background-color: color-mix(in srgb, var(--warning-color) 15%, transparent);
+    i{
+        color: var(--warning-color);
+    }
+}
+
+.card__color__danger{
+    background-color: color-mix(in srgb, var(--danger-color) 15%, transparent);
+    i{
+        color: var(--danger-color);
+    }
+}
+
+.active_card{
+    background-color: color-mix(in srgb, var(--color-primary) 4%, transparent) !important;
+    color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.card{
+    width: -webkit-fill-available;
+    margin: 4px 4px;
+    height: auto;
+    border: 0.1rem solid var(--color-border);
+    border-radius: 4px;
+    background-color: white;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    //box-shadow: 2px 2px 4px color-mix(in srgb, var(--color-primary) 15%, transparent), -2px -2px 4px color-mix(in srgb, var(--color-primary) 15%, transparent);
+
+}
+.card:hover {
+    /*box-shadow: 0 4px 8px color-mix(in srgb, var(--color-primary) 15%, transparent);*/
+    box-shadow: 2px 2px 4px color-mix(in srgb, var(--color-primary) 15%, transparent), -2px -2px 4px color-mix(in srgb, var(--color-primary) 15%, transparent);
+    /*transition: box-shadow 0.15s ease-in-out;*/
+    /*transform: translate(-1px, -2px);*/
+
+}
+
+.card__wrapper{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}

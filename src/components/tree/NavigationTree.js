@@ -8,32 +8,6 @@ import {getAPIParam, isNotEmpty, typeDisplay} from "@/utils/utils";
 import {nanoid} from "nanoid";
 import {useDispatch, useSelector} from "react-redux";
 
-// import {
-//     getAccessLog,
-//     getAdminLog,
-//     getBrokerLog,
-//     getBrokers,
-//     getDatabases,
-//     getDBLog,
-//     getDBUser,
-//     getTables
-// } from "@/utils/api";
-// import ServerMenu from "@/components/common/menus/ServerMenu";
-// import BrokersMenu from "@/components/common/menus/BrokersMenu";
-// import BrokerMenu from "@/components/common/menus/BrokerMenu";
-// import UsersMenu from "@/components/common/menus/UsersMenu";
-// import UserMenu from "@/components/common/menus/UserMenu";
-// import ViewSQLLog from "@/components/contents/broker/ViewSQLLog";
-// import DatabaseMenu from "@/components/common/menus/DatabaseMenu";
-// import {setAdminLog, setDBErrorLogs, setErrorLogs, setSubServerLogs} from "@/state/logSlicce";
-// import AccessLog from "@/components/contents/log/manager/AccessLog";
-// import ErrorLog from "@/components/contents/log/manager/ErrorLog";
-// import BrokerErrorLog from "@/components/contents/log/broker/BrokerErrorLog";
-// import ServerErrorLog from "@/components/contents/log/server/ServerErrorLog";
-// import Dashboard from "@/components/contents/dashboard/Dashboard";
-// import BrokersStatus from "@/components/contents/broker/BrokersStatus";
-// import BrokerStatus from "@/components/contents/broker/BrokerStatus";
-// import DatabasesMenu from "@/components/common/menus/DatabasesMenu";
 import {
     getAdminLogFormat,
     getBrokerFormat,
@@ -54,7 +28,6 @@ import {
     setBrokers,
     setDatabases, setErrorLogs,
     setServers,
-    setSubDatabase,
     setSubServers,
     setTables, setTriggers, setUsers,
     setViews
@@ -70,13 +43,13 @@ import {
     getTriggerAPI
 } from "@/api";
 import {setLoginDB} from "@/store/dialogReducer";
-import ServerMenu from "@/components/common/menus/ServerMenu";
-import DatabasesMenu from "@/components/common/menus/DatabasesMenu";
-import DatabaseMenu from "@/components/common/menus/DatabaseMenu";
-import UsersMenu from "@/components/common/menus/UsersMenu";
-import UserMenu from "@/components/common/menus/UserMenu";
-import BrokersMenu from "@/components/common/menus/BrokersMenu";
-import BrokerMenu from "@/components/common/menus/BrokerMenu";
+import ServerMenu from "@/components/menus/ServerMenu";
+import DatabasesMenu from "@/components/menus/DatabasesMenu";
+import DatabaseMenu from "@/components/menus/DatabaseMenu";
+import UsersMenu from "@/components/menus/UsersMenu";
+import UserMenu from "@/components/menus/UserMenu";
+import BrokersMenu from "@/components/menus/BrokersMenu";
+import BrokerMenu from "@/components/menus/BrokerMenu";
 import {addContents, setActivePanel, setSelectedObject, setTreeKey} from "@/store/generalReducer";
 import Dashboard from "@/components/contents/dashboard/Dashboard";
 import ViewSQLLog from "@/components/contents/broker/ViewSQLLog";
@@ -86,7 +59,6 @@ import BrokerErrorLog from "@/components/contents/log/broker/BrokerErrorLog";
 import ServerErrorLog from "@/components/contents/log/server/ServerErrorLog";
 import BrokersStatus from "@/components/contents/broker/BrokersStatus";
 import BrokerStatus from "@/components/contents/broker/BrokerStatus";
-import Button from "@/components/ui/button";
 
 
 function buildTree(...dataSets) {

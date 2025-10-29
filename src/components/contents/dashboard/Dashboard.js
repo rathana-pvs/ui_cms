@@ -44,19 +44,19 @@ const getItems = (panelStyle) => [
 ];
 const Dashboard = () => {
     const { token } = theme.useToken();
-    const {selectedObject} = useSelector((state) => state.general);
+    const {activeServer} = useSelector((state) => state.treeReducer);
     const panelStyle = {
         marginBottom: 8,
     };
-    console.log(selectedObject);
-    if(!selectedObject.serverId) {
+
+    if(!activeServer.uid) {
         return null;
     }
 
     return (
         <Collapse
             bordered={false}
-            defaultActiveKey={['1', '3', '4', '5']}
+            defaultActiveKey={['1', '2', '3', '4', '5']}
             expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
             items={getItems(panelStyle)}
         />

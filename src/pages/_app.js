@@ -62,9 +62,10 @@ const darkTheme = {
 
 function AppWrapper({ Component, pageProps }) {
     const router = useRouter();
-    const {loading} = useAuth();
+    const { checkingAuth } = useAuth();
 
     const themeMode = useSelector((state) => state.pref.themeMode);
+    const loading = useSelector(state => state.dialog.loading);
     const palette = themeMode === "dark" ? darkTheme : lightTheme;
 
     const [mounted, setMounted] = useState(false);
@@ -76,13 +77,17 @@ function AppWrapper({ Component, pageProps }) {
             colorPrimary: palette.primary,
             colorBgContainer: palette.background,
             colorText: palette.text,
+            fontsize: 13
         },
         algorithm: themeMode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
     };
-
+    if (checkingAuth) {
+        // Prevent rendering pages until auth is checked
+        return <div>Loading...</div>; // or a spinner
+    }
     return (
         <ConfigProvider theme={customTheme}>
-            {loading? <h1>Loading...</h1> : <Component {...pageProps} />}
+            <Component {...pageProps} />
             <LoadingScreen />
         </ConfigProvider>
     );

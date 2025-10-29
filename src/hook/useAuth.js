@@ -8,7 +8,7 @@ import { setUser } from "@/store/authReducer";
 import { setLoading } from "@/store/dialogReducer";
 
 export function useAuth() {
-    const [loading, setLoadingState] = useState(false);
+    const [checkingAuth, setCheckingAuth] = useState(true); // new state
     const router = useRouter();
     const pathname = usePathname();
     const dispatch = useDispatch();
@@ -16,41 +16,40 @@ export function useAuth() {
     const publicPaths = ["/login", "/register"];
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-
         const checkAuth = async () => {
+            const token = localStorage.getItem("token");
+            dispatch(setLoading(true));
+
             if (!token) {
                 if (!publicPaths.includes(pathname)) {
                     router.replace("/login");
                 }
-                setLoadingState(false);
+                dispatch(setLoading(false));
+                setCheckingAuth(false);
                 return;
             }
 
             try {
                 axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
                 const res = await axios.get("/api/proxy/user");
-
                 dispatch(setUser(res.data));
-                router.replace("/");
 
+                if (pathname === "/login" || pathname === "/register") {
+                    router.replace("/"); // redirect logged-in users from login/register
+                }
             } catch (err) {
-                console.warn("Auth check failed:", err?.message);
                 localStorage.removeItem("token");
                 if (!publicPaths.includes(pathname)) {
                     router.replace("/login");
                 }
-                // dispatch(setLoading(false));
-                // setLoadingState(false);
-            }finally {
-                setLoadingState(false);
+            } finally {
+                dispatch(setLoading(false));
+                setCheckingAuth(false);
             }
         };
 
         checkAuth();
-
-
     }, [pathname]);
 
-    return { loading };
+    return { checkingAuth };
 }

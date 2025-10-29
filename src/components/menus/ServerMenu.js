@@ -10,12 +10,13 @@ import {setServers} from "@/store/treeReducer";
 import {addContents, setActivePanel} from "@/store/generalReducer";
 import Dashboard from "@/components/contents/dashboard/Dashboard";
 import React from "react";
+import {deleteHostAPI} from "@/api/cmApi";
 
 
-export default function({node, event, open, onClose}) {
+export default function({server, clientX, clientY, open, onClose}) {
     const {servers} = useSelector(state => state.treeReducer);
     const dispatch = useDispatch();
-    const {clientX, clientY} = event;
+
     const menuItems = [
         {
             label: "Disconnect Host",
@@ -33,8 +34,7 @@ export default function({node, event, open, onClose}) {
             label: 'Edit Host',
             key: nanoid(4),
             icon: <EditOutlined />,
-            onClick:()=>dispatch(setConnection({open: true, type: "edit", serverId: node.serverId}))
-
+            onClick:()=>dispatch(setConnection({open: true, type: "edit", server}))
         },
         {
             label: 'Delete Host',
@@ -60,10 +60,10 @@ export default function({node, event, open, onClose}) {
             key: nanoid(4),
             icon: <DeleteOutlined style={{color: 'var(--danger-color)'}} />,
             onClick:()=>{
-                dispatch(addContents(
-                    {...node, label:"dashboard", children: <Dashboard/>,}
-                    ))
-                dispatch(setActivePanel(node.key))
+                // dispatch(addContents(
+                //     {...node, label:"dashboard", children: <Dashboard/>,}
+                //     ))
+                // dispatch(setActivePanel(node.key))
             }
         },
         {
@@ -71,14 +71,14 @@ export default function({node, event, open, onClose}) {
             key: nanoid(4),
             icon: <DeleteOutlined style={{color: 'var(--danger-color)'}} />,
             onClick: ()=> {
-                dispatch(setVersion(true))
+                // dispatch(setVersion(true))
             }
         },
         {
             label: 'Properties',
             key: nanoid(4),
             onClick: ()=> {
-                dispatch(setProperty({open: true, node}))
+                // dispatch(setProperty({open: true, node}))
             }
 
         },
@@ -87,17 +87,19 @@ export default function({node, event, open, onClose}) {
             key: nanoid(4),
             icon: <DeleteOutlined style={{color: 'var(--danger-color)'}} />,
             onClick: ()=> {
-                dispatch(setUnifySetting({open: true, node}))
+                // dispatch(setUnifySetting({open: true, node}))
                 //
             }
 
         },
     ]
 
-    const handleDelete = ()=>{
-        const connections = servers.filter(item => item.serverId !== node.serverId);
-        setLocalStorage("connections", connections);
-        dispatch(setServers(connections));
+    const handleDelete = async () => {
+        const response = await deleteHostAPI(server);
+        if(response.status) {
+            const newServer = servers.filter(res=>res.uid !== server.uid)
+            dispatch(setServers(newServer));
+        }
     }
     return (
         <Dropdown overlayStyle={{minWidth: 200}}  menu={{items: menuItems}}

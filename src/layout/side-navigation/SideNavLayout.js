@@ -5,98 +5,141 @@ import {useDispatch, useSelector} from "react-redux";
 import {Tabs, Tree} from "antd";
 import TreeDatabase from "@/layout/side-navigation/tree-expand/TreeDatabase";
 import TreeBroker from "@/layout/side-navigation/tree-expand/TreeBroker";
-import {getDatabasesAPI, getHostsAPI} from "@/api/cmApi";
-import {setActiveServer, setDatabases, setServers} from "@/store/treeReducer";
-import {getDatabaseFormat} from "@/utils/navigation";
-
-const Databases = [
-    {
-        title: 'demodb',
-        icon: <i style={{color: "var(--color-yellow)"}} className={`fa-regular fa-database `}/>,
-        key: '0',
-        children: [
-            {
-                title: 'Tables',
-                key: '0-0',
-                icon: <i className="fa-regular fa-table" style={{color: "var(--color-light-blue)"}}/>
-            },
-            {
-                title: 'Views',
-                key: '0-1',
-                icon: <i className="fa-regular fa-eye" style={{color: "var(--color-purple)"}}/>
-            },
-        ],
-    },
-];
-const Brokers = [
-    {
-        title: 'broker1 (33000, RW)',
-        key: '1',
-        isLeaf: false,
-        icon: <i className="fa-regular fa-folder-gear" style={{color: "#E06B80"}}/>
-    },
-    {
-        title: 'query_editor (30000, RW)',
-        key: '2',
-        isLeaf: false,
-        icon: <i className="fa-regular fa-folder-gear" style={{color: "#E06B80"}}/>
-    },
-];
+import {getBrokersAPI, getDatabasesAPI, getHostsAPI, revokeLogin} from "@/api/cmApi";
+import {setActiveServer, setBrokers, setDatabases, setServers} from "@/store/treeReducer";
+import {
+    getBrokerFormat,
+    getDatabaseFormat,
+    getFileTemplateFormat, getFolderTemplateFormat,
+    getServerFormat,
+    getTemplateFormat
+} from "@/utils/navigation";
+import {addContents, setActivePanel} from "@/store/generalReducer";
+import Dashboard from "@/components/contents/dashboard/Dashboard";
+import ViewSQLLog from "@/components/contents/broker/ViewSQLLog";
+import AccessLog from "@/components/contents/log/manager/AccessLog";
+import ErrorLog from "@/components/contents/log/manager/ErrorLog";
+import BrokerErrorLog from "@/components/contents/log/broker/BrokerErrorLog";
+import ServerErrorLog from "@/components/contents/log/server/ServerErrorLog";
+import BrokersStatus from "@/components/contents/broker/BrokersStatus";
+import BrokerStatus from "@/components/contents/broker/BrokerStatus";
+import ServerMenu from "@/components/menus/ServerMenu";
+import DatabasesMenu from "@/components/menus/DatabasesMenu";
+import DatabaseMenu from "@/components/menus/DatabaseMenu";
+import UsersMenu from "@/components/menus/UsersMenu";
+import UserMenu from "@/components/menus/UserMenu";
+import BrokersMenu from "@/components/menus/BrokersMenu";
+import BrokerMenu from "@/components/menus/BrokerMenu";
+import {nanoid} from "nanoid";
+import ServerCard from "@/components/server/ServerCard";
+import {setLoading} from "@/store/dialogReducer";
 
 
-const Logs = [
-    {
-        title: 'Broker',
-        key: '3',
-        isLeaf: false,
-        icon: <i className="fa-solid fa-folder icon__folder" style={{color:'var(--color-yellow)'}}></i>
-    },
-    {
-        title: 'Manager',
-        key: '4',
-        isLeaf: false,
-        icon: <i className="fa-solid fa-folder icon__folder" style={{color:'var(--color-yellow)'}}></i>
 
-    },
-    {
-        title: 'Server',
-        key: '5',
-        isLeaf: false,
-        icon: <i className="fa-solid fa-folder icon__folder" style={{color:'var(--color-yellow)'}}></i>
-    },
-];
+function buildTree(...dataSets) {
+    const map = new Map();
+    dataSets.flat().forEach(item => {
+        map.set(item.key, { ...item, children: item.sub?item.sub:[] });
+    });
+    const tree = [];
+    map.forEach((node) => {
+        if (node.parentId) {
+            const parent = map.get(node.parentId);
+            if (parent) parent.children.push(node);
+        } else {
+            tree.push(node);
+        }
+    });
+    return tree;
+}
 
-const treeData = [Databases, Brokers, Logs];
+const panels = [
+    {type: "server", children: <Dashboard/>, closeIcon: <i className="fa-solid fa-xmark" style={{fontSize: 13}}></i>},
+    {type: "broker_log_file", children: <ViewSQLLog/>},
+    {type: "manager_access_log", children: <AccessLog/>},
+    {type: "manager_error_log", children: <ErrorLog/>},
+    {type: "broker_error_log", children: <BrokerErrorLog/>},
+    {type: "server_db_log", children: <ServerErrorLog/>},
+    {type: "brokers", children: <BrokersStatus/>},
+    {type: "broker", children: <BrokerStatus/>}
+]
+
+const menus = [
+    {type: "server", Screen: ServerMenu},
+    {type: "databases", Screen: DatabasesMenu},
+    {type: "database", Screen: DatabaseMenu},
+    {type: "users", Screen: UsersMenu},
+    {type: "user", Screen: UserMenu},
+    {type: "brokers", Screen: BrokersMenu},
+    {type: "broker", Screen: BrokerMenu}
+]
 
 
 
 export default function Vertical() {
     const [topHeight, setTopHeight] = useState(200);
     // const [activeServer, setActiveServer] = useState(null);
-    const {servers, activeServer} = useSelector((state) => state.treeReducer);
+    const {contents} = useSelector(state=> state.general);
+    const {user} = useSelector(state => state.auth);
+    const {servers, databases, brokers, activeServer} = useSelector((state) => state.treeReducer);
     const [activeTree, setActiveTree] = useState(0)
+    const [subLogger, setSubLogger] = useState([]);
+    const [subBrokerLog, setSubBrokerLog] = useState([]);
+    const [subServerLog, setSubServerLog] = useState([]);
+    const [menu, setMenu] = useState({});
     const dispatch = useDispatch();
     const treeItems = ["DB", "Broker", "Log"]
 
-    useEffect(() => {
-       getHostsAPI().then(res=>{
 
-           dispatch(setServers(res));
-       })
+    useEffect(() => {
+        dispatch(setLoading(false));
     },[])
 
+    useEffect(() => {;
+        if(user.id){
+            getHostsAPI().then(res=>{
+                const newServers = res.map(item=>getServerFormat(item));
+                dispatch(setServers(newServers));
+            })
+        }
+
+    },[user])
+
     useEffect(() => {
-        // if(activeServer.uid){
-        //     getDatabasesAPI(activeServer).then(res=>{
-        //         if(res.success){
-        //             const newDatabases = res.result.map(item => getDatabaseFormat(item, node));
-        //             dispatch(setDatabases(newDatabases));
-        //         }
-        //     })
-        //
-        //
-        // }
+        if(activeServer.uid){
+            handleChangeServer(activeServer)
+        }
+
     }, [activeServer.uid]);
+
+    const handleContextMenu = (e, server) => {
+        e.preventDefault();
+        menus.forEach((item) => {
+            if(item.type === server.type){
+                setMenu({...e, server, Screen: item.Screen,  open: true});
+            }
+        })
+    };
+
+    const renderManu = ()=>{
+        const {Screen, open, ...e} = menu
+        if(Screen){
+            return <Screen {...e} open={open} onClose={()=>setMenu({...menu, open: false})}/>
+        }
+        return null
+
+    }
+
+    const getTreeData = ()=>{
+        if(activeTree === 0){
+            return buildTree(databases)
+        }else if(activeTree === 1){
+            return buildTree(brokers)
+        }else if(activeTree === 2){
+            console.log(buildTree(subLogger, subBrokerLog))
+            return buildTree(subLogger, subBrokerLog)
+        }
+    }
     const getServerSection = ()=>{
         if(activeServer.uid){
             return (
@@ -124,7 +167,7 @@ export default function Vertical() {
                             switcherIcon={({expanded})=> {
                                 return expanded ? <i className="fa-regular fa-square-minus" />:<i className="fa-regular fa-square-plus"/>
                             }}
-                            treeData={treeData[activeTree]}
+                            treeData={getTreeData()}
 
                         />
                         {/*<Tabs*/}
@@ -141,12 +184,95 @@ export default function Vertical() {
         return null
     }
 
+    const onDoubleClick = (node) => {
+        panels.forEach((res) => {
+            if(res.type === node.type) {
+                const checkObject = contents.find(item => item.key === node.key) || false
+                if(!checkObject){
+                    dispatch(addContents({label: node.title,
+                        ...node,
+                        ...res}))
+                }
+                dispatch(setActivePanel(node.key))
+            }
+        })
+    }
 
+   const handleChangeServer = async (server) => {
+       const response = await revokeLogin(server)
+       if(response){
+           getDatabasesAPI(activeServer).then(res=>{
+               if(res.success){
+                   const newDatabases = res.result?.map(item => getDatabaseFormat(item));
+                   dispatch(setDatabases(newDatabases));
+               }
+           })
+           getBrokersAPI(activeServer).then(res=>{
+               const newBrokers = res.result?.map(item => getBrokerFormat(item));
+               dispatch(setBrokers(newBrokers))
+           })
 
-    const tree = [
-        {key: 0, children: <TreeBroker serverId={activeServer}/>, label: "TreeBroker"},
-        {key: 1, children: <TreeDatabase serverId={activeServer}/>, label: "TreeDatabase"},
-    ]
+           const subLog = [
+               {
+                   // ...getTemplateFormat(activeServer),
+                   key: nanoid(4),
+                   title: "Broker",
+                   type: "log_broker",
+                   icon: <i className="fa-regular fa-folder-tree"></i>,
+               },
+               {
+                   key: nanoid(4),
+                   title: "Manager",
+                   type: "manager",
+                   icon: <i className="fa-regular fa-computer"></i>,
+                   sub: [
+                       {
+                           key: nanoid(4),
+                           title: "Access Log",
+                           type: "manager_access_log",
+                           isLeaf:true
+
+                       },
+                       {
+                           key: nanoid(4),
+                           title: "Error Log",
+                           type: "manager_error_log",
+                           icon: <i className="fa-regular fa-file error"></i>,
+                           isLeaf: true,
+                       }
+                   ]
+               },
+               {
+                   key: nanoid(4),
+                   title: "Server",
+                   type: "log_server",
+                   icon: <i className="fa-regular fa-server"></i>
+               }
+           ]
+           setSubLogger(subLog)
+
+           const newSubBrokerLog = [
+               {
+                   ...getFolderTemplateFormat(subLog[0]),
+                   title: "Access Log",
+                   type: "folder_access_log",
+               },
+               {
+                   ...getFolderTemplateFormat(subLog[0]),
+                   title: "Error Log",
+                   type: "folder_error_log",
+               },
+               {
+                   ...getFolderTemplateFormat(subLog[0]),
+                   title: "Admin Log",
+                   type: "folder_admin_log",
+                   children: [],
+               }
+           ]
+           setSubBrokerLog(newSubBrokerLog)
+       }
+
+   }
     return (
         <div
             style={{
@@ -155,6 +281,7 @@ export default function Vertical() {
                 height: "100vh",
             }}
         >
+            {renderManu()}
             <div
                 style={{
                     height: topHeight,
@@ -162,11 +289,27 @@ export default function Vertical() {
                 className={styles.tree__host}
             >
                 {
-                    servers.map(server =>{
-                        return <div
-                                className={`${styles.host__item} ${server.uid === activeServer.uid ? styles.host__active : ""}`}
-                            key={server.key} onClick={()=>dispatch(setActiveServer(server))}>
-                            {server.alias}</div>
+                    // servers.map(server =>{
+                    //     return <div
+                    //             className={`${styles.host__item} ${server.uid === activeServer.uid ? styles.host__active : ""}`}
+                    //         key={server.key} onClick={()=>{
+                    //             dispatch(setActiveServer(server))
+                    //             onDoubleClick(server)
+                    //     }}
+                    //             onContextMenu={(e)=>handleContextMenu(e, server)}
+                    //     >
+                    //         {server.alias}</div>
+                    // })
+                    servers.map(server=>{
+                        const {key, ...restProps} = server
+                        return <ServerCard key={key} {...restProps}
+                                           status={server.uid === activeServer.uid}
+                                           onClick={()=> {
+                                               dispatch(setActiveServer(server))
+                                               onDoubleClick(server)
+                                           }}
+                                           onContextMenu={(e)=>handleContextMenu(e, server)}
+                        />
                     })
                 }
             </div>

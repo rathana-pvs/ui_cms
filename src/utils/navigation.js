@@ -5,7 +5,7 @@ import {FolderGearIcon, FolderIcon} from "@/components/common/icons";
 
 export const getTemplateFormat = (node)=>{
     return {
-        serverId: node.serverId,
+        // serverId: node.serverId,
         parentId: node.key,
         key: nanoid(4)
     }
@@ -31,29 +31,31 @@ export const getServerFormat =(server)=>{
         ...server,
         key: nanoid(4),
         serverId: nanoid(4),
-        title: server.name,
+        title: server.alias,
         type: "server",
         icon: <i className="fa-regular fa-server success server__icon"/>,
         isLeaf: false,
-
     }
 }
 
-export const getDatabaseFormat =(item, node)=>{
+export const getDatabaseFormat =(item)=>{
+    console.log(item)
     return {
         ...item,
-        ...getTemplateFormat(node),
+        // ...getTemplateFormat(node),
+        key: nanoid(4),
         title: item.dbname,
         type: "database",
         isLogin: false,
-        icon: <i style={{color: "var(--color-yellow)"}} className={`fa-regular fa-database ${item.status === "inactive" ? "warning" : "success"}`}/>,
+        icon: <i className={`fa-regular fa-database ${item.status === "inactive" ? "warning" : "success"}`}/>,
 
     }
 }
 
 export const getBrokerFormat =(item, node)=>{
     return {
-        ...getTemplateFormat(node),
+        // ...getTemplateFormat(node),
+        key: nanoid(4),
         title: `${item.name} (${item.port})`,
         icon: <FolderGearIcon status={item.state === "ON"}/>,
         ...item,

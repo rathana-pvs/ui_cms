@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import { Space, Table, Tag } from 'antd';
 import {useSelector} from "react-redux";
 import {nanoid} from "nanoid";
-import {getBrokerStatusAPI} from "@/api";
 import styles from '@/components/contents/dashboard/dashboard.module.css'
+import {getBrokerStatusAPI} from "@/api/cmApi";
 
 
 const columns = [
@@ -70,14 +70,14 @@ const columns = [
 ];
 
 export default function () {
-    const {brokers} = useSelector(state=>state.treeReducer);
-    const {selectedObject} = useSelector(state=>state.general);
-    const [brokerData, setBrokerData] = useState();
+    const {brokers, activeServer} = useSelector(state=>state.treeReducer);
+    const [brokerData, setBrokerData] = useState([]);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-            const allRequest = brokers.map((broker) => {
-                return getBrokerStatusAPI(selectedObject, {bname: broker.name});
+            const allRequest = brokers?.map((broker) => {
+                return getBrokerStatusAPI(activeServer, {bname: broker.name});
             })
+        if(allRequest){
             Promise.all(allRequest).then(responses => {
                 const dataSource = []
                 for(let i=0; i<responses.length; i++) {
@@ -95,7 +95,9 @@ export default function () {
 
                 setBrokerData(dataSource)
             })
-    },[])
+        }
+
+    },[brokers])
 
     return(
         <div className={styles.broker}>

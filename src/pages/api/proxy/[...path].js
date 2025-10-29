@@ -4,6 +4,7 @@ import https from "https";
 export default async function handler(req, res) {
     const { method, headers, body } = req;
     const path = req.query.path.join("/");
+    console.log(`https://192.168.2.36:8080/${path}`);
     const backendUrl = `https://192.168.2.36:8080/${path}`;
     try {
         const httpsAgent = new https.Agent({ rejectUnauthorized: false });
@@ -15,7 +16,9 @@ export default async function handler(req, res) {
                 Authorization: headers.authorization,
                 "Content-Type": "application/json",
             },
-            body: method !== "GET" && method !== "HEAD" ? JSON.stringify(body) : undefined,
+            body: method !== "GET" && method !== "HEAD" && method !== "DELETE"
+                ? JSON.stringify(body)
+                : undefined,
             agent: httpsAgent, // works with node-fetch
         });
 
@@ -28,6 +31,7 @@ export default async function handler(req, res) {
             // fallback if not JSON
             data = await response.text();
         }
+        console.log(response);
         res.status(response.status).json(data);
     } catch (err) {
         console.error("Proxy Error:", err);

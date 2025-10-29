@@ -1,17 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useSelector} from "react-redux";
-import {getResponse} from "@/api";
+import {getResponse} from "@/api/cmApi";
 
 export default function (){
-    const {servers} = useSelector(state=>state.treeReducer);
-    const {selectedObject} = useSelector(state=>state.general);
+    const {servers, activeServer} = useSelector(state=>state.treeReducer);
     const [server, setServer] = useState({});
     const [version, setVersion] = useState({});
     useEffect(() => {
-        if (selectedObject.serverId) {
-            const server = servers.find(res => res.serverId === selectedObject.serverId)
+        if (activeServer.serverId) {
+            const server = servers.find(res => res.uid === activeServer.uid)
             setServer(server)
-            getResponse(selectedObject, {task:"getenv"}).then(res=>{
+            getResponse(activeServer, {task:"getenv"}).then(res=>{
                 if(res.success){
                     setVersion(res)
                 }
@@ -21,7 +20,7 @@ export default function (){
 
 
         }
-    },[selectedObject])
+    },[])
 
 
     return <div>

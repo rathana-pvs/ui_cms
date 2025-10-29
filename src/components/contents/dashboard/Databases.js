@@ -3,13 +3,13 @@ import styles from '@/components/contents/dashboard/dashboard.module.css'
 import {Checkbox, Table, } from 'antd';
 import {useSelector} from "react-redux";
 import {nanoid} from "nanoid";
-import {getDatabasesAPI} from "@/api";
 import {deletePrefAutoStartupDatabase, getPrefAutoStartupDatabase, setPrefAutoStartupDatabase} from "@/preference/pref";
+import {getDatabasesAPI} from "@/api/cmApi";
 
 
 
 export default function (){
-    const {selectedObject} = useSelector(state=>state.general);
+    const {activeServer} = useSelector(state=>state.treeReducer);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -43,15 +43,14 @@ export default function (){
     ];
 
     useEffect(() => {
-        if (selectedObject.serverId) {
-            getDatabasesAPI(selectedObject).then(response => {
+        if (activeServer.uid) {
+            getDatabasesAPI(activeServer).then(response => {
                 if(response.success){
                     let prefAuto = getPrefAutoStartupDatabase();
-                    setData(response.result.map(res=>{
-                        let prefKey =`${selectedObject.serverId}.${res.dbname}`
-                        console.log(prefKey);
+                    setData(response.result?.map(res=>{
+                        let prefKey =`${activeServer.uid}.${res.dbname}`
                         return {
-                            serverId: selectedObject.serverId,
+                            serverId: activeServer.uid,
                             key: nanoid(4),
                             database: res.dbname,
                             auto: prefAuto?.includes(prefKey),
@@ -63,7 +62,7 @@ export default function (){
                 setLoading(false)
             })
         }
-    },[selectedObject])
+    },[])
 
 
     return(
