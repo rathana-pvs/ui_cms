@@ -3,7 +3,8 @@ import { Space, Table, Tag } from 'antd';
 import {useSelector} from "react-redux";
 import {nanoid} from "nanoid";
 import styles from '@/components/contents/dashboard/dashboard.module.css'
-import {getBrokerStatusAPI} from "@/api/cmApi";
+import {getBrokersAPI, getBrokerStatusAPI} from "@/api/cmApi";
+import {getBrokerFormat} from "@/utils/navigation";
 
 
 const columns = [
@@ -70,34 +71,40 @@ const columns = [
 ];
 
 export default function () {
-    const {brokers, activeServer} = useSelector(state=>state.treeReducer);
+    const {activeServer} = useSelector(state=>state.treeReducer);
     const [brokerData, setBrokerData] = useState([]);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-            const allRequest = brokers?.map((broker) => {
+
+        getBrokersAPI(activeServer).then(res=>{
+            const newBrokers = res.result?.map(item => getBrokerFormat(item));
+            const allRequest = newBrokers?.map((broker) => {
                 return getBrokerStatusAPI(activeServer, {bname: broker.name});
             })
-        if(allRequest){
-            Promise.all(allRequest).then(responses => {
-                const dataSource = []
-                for(let i=0; i<responses.length; i++) {
-                    const {success, result} = responses[i];
-                    if(success){
-                        dataSource.push({
-                            ...brokers[i],
-                            key: nanoid(4),
-                            qps: result[0].as_num_query,
-                            tps: result[0].as_num_tran
-                        })
+            if(allRequest){
+                Promise.all(allRequest).then(responses => {
+                    const dataSource = []
+                    for(let i=0; i<responses.length; i++) {
+                        const {success, result} = responses[i];
+                        if(success){
+                            dataSource.push({
+                                ...newBrokers[i],
+                                key: nanoid(4),
+                                qps: result[0].as_num_query,
+                                tps: result[0].as_num_tran
+                            })
+                        }
                     }
-                }
-                setLoading(false);
+                    setLoading(false);
 
-                setBrokerData(dataSource)
-            })
-        }
+                    setBrokerData(dataSource)
+                })
+            }
+        })
 
-    },[brokers])
+
+
+    },[])
 
     return(
         <div className={styles.broker}>

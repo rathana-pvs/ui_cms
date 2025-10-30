@@ -241,12 +241,12 @@ export default function () {
                             <Form.Item>
                                 <Row align="middle" className={styles.action} gutter={[0, 0]} style={{ width: "100%" }}>
 
-                                    <Col>
-                                        <Button type={"primary"} className={"button button__primary button__small"}
-                                                htmlType="submit" onClick={()=>onAction("test")}>
-                                            Test Connection
-                                        </Button>
-                                    </Col>
+                                    {/*<Col>*/}
+                                    {/*    <Button type={"primary"} className={"button button__primary button__small"}*/}
+                                    {/*            htmlType="submit" onClick={()=>onAction("test")}>*/}
+                                    {/*        Test Connection*/}
+                                    {/*    </Button>*/}
+                                    {/*</Col>*/}
                                     <Col>
                                         <Button type={"primary"} className={"button button__small"}
                                                 htmlType="submit" onClick={()=>onAction("save")}>

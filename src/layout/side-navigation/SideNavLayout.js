@@ -136,7 +136,6 @@ export default function Vertical() {
         }else if(activeTree === 1){
             return buildTree(brokers)
         }else if(activeTree === 2){
-            console.log(buildTree(subLogger, subBrokerLog))
             return buildTree(subLogger, subBrokerLog)
         }
     }
