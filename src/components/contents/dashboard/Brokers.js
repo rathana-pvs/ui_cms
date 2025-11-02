@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { Space, Table, Tag } from 'antd';
 import {useSelector} from "react-redux";
 import {nanoid} from "nanoid";
 import styles from '@/components/contents/dashboard/dashboard.module.css'
 import {getBrokersAPI, getBrokerStatusAPI} from "@/api/cmApi";
 import {getBrokerFormat} from "@/utils/navigation";
+import {getIntervalDashboard, setIntervalDashboard} from "@/preference/pref";
+import {setActivePanel} from "@/store/generalReducer";
 
 
 const columns = [
@@ -70,12 +72,14 @@ const columns = [
     }
 ];
 
-export default function () {
+export default function (props) {
+    const {activePanel} = useSelector(state => state.general);
     const {activeServer} = useSelector(state=>state.treeReducer);
     const [brokerData, setBrokerData] = useState([]);
     const [loading, setLoading] = useState(true);
-    useEffect(() => {
+    let intervalId = null
 
+    const getRefreshData = async () => {
         getBrokersAPI(activeServer).then(res=>{
             const newBrokers = res.result?.map(item => getBrokerFormat(item));
             const allRequest = newBrokers?.map((broker) => {
@@ -101,10 +105,28 @@ export default function () {
                 })
             }
         })
+    }
 
-
-
+    useEffect(()=>{
+        getRefreshData()
     },[])
+
+
+    useEffect(() => {
+        if(intervalId){
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+        if(props.uniqueKey === activePanel){
+            const intervals = getIntervalDashboard()
+            const value = intervals[activeServer.uid]
+            const parsed = value != null ? parseInt(value) : 0;
+            console.log(parsed);
+            if(parsed > 0){
+                intervalId = setInterval(getRefreshData, parsed * 1000)
+            }
+        }
+    },[activePanel])
 
     return(
         <div className={styles.broker}>

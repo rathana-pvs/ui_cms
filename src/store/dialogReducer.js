@@ -21,6 +21,7 @@ const initialState = {
     property: {open: false},
     unifySetting: {open: false},
     brokerParser: {open: false},
+    dashboardConfig: {open: false},
     exportHost: false,
     importHost: false,
     about: false,
@@ -105,6 +106,9 @@ const dialogReducer = createSlice({
         },
         setImportHost: (state, action) => {
             state.importHost = action.payload;
+        },
+        setDashboardConfig: (state, action) => {
+            state.dashboardConfig = action.payload;
         }
     },
 });
@@ -114,5 +118,5 @@ export const { setConnection, setCompactDB, setCheckDB, setBackupDB,
     setUserManagement, setExportHost, setImportHost, setBrokerParser,
     setUnifySetting, setCreateDB, setAbout, setVersion, setProperty,
     setParamDump, setChangeCMPassword, setPlanDump, setRestoreDB,
-    setUserDB, setLoginDB,  setLoading } = dialogReducer.actions;
+    setUserDB, setDashboardConfig, setLoginDB,  setLoading } = dialogReducer.actions;
 export default dialogReducer.reducer;

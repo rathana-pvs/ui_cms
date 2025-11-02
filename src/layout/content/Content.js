@@ -49,10 +49,14 @@ const Content = () => {
                 activeKey={activePanel}
                 type="editable-card"
                 onEdit={onEdit}
-                items={contents.map(res=>({
-                    ...res,
-                    closeIcon: <i className="fa-solid fa-xmark" style={{fontSize: 13}}></i>
-                }))}
+                items={contents.map(({key,children: Comp, label, icon})=>{
+                    return{
+                        key,
+                        label,
+                        icon,
+                    closeIcon: <i className="fa-solid fa-xmark" style={{fontSize: 13}}></i>,
+                    children: <Comp uniqueKey={key}/>}
+                })}
                 size={"large"}
                 tabBarStyle={{
                     borderRadius: 12,

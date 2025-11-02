@@ -54,14 +54,14 @@ function buildTree(...dataSets) {
 }
 
 const panels = [
-    {type: "server", children: <Dashboard/>, closeIcon: <i className="fa-solid fa-xmark" style={{fontSize: 13}}></i>},
-    {type: "broker_log_file", children: <ViewSQLLog/>},
-    {type: "manager_access_log", children: <AccessLog/>},
-    {type: "manager_error_log", children: <ErrorLog/>},
-    {type: "broker_error_log", children: <BrokerErrorLog/>},
-    {type: "server_db_log", children: <ServerErrorLog/>},
-    {type: "brokers", children: <BrokersStatus/>},
-    {type: "broker", children: <BrokerStatus/>}
+    {type: "server", children: Dashboard, closeIcon: <i className="fa-solid fa-xmark" style={{fontSize: 13}}></i>},
+    {type: "broker_log_file", children: ViewSQLLog},
+    {type: "manager_access_log", children: AccessLog},
+    {type: "manager_error_log", children: ErrorLog},
+    {type: "broker_error_log", children: BrokerErrorLog},
+    {type: "server_db_log", children: ServerErrorLog},
+    {type: "brokers", children: BrokersStatus},
+    {type: "broker", children: BrokerStatus}
 ]
 
 const menus = [

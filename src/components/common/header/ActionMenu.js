@@ -9,6 +9,7 @@ import CMConfig from "@/components/contents/config-param/CMConfig";
 import CubridConfig from "@/components/contents/config-param/CubridConfig";
 import CubridBrokerConfig from "@/components/contents/config-param/CubridBrokerConfig";
 import {addContents, setActivePanel} from "@/store/generalReducer";
+import {setDashboardConfig} from "@/store/dialogReducer";
 
 
 const CONFIG_PARAM_CONTENT = [
@@ -21,8 +22,9 @@ const CONFIG_PARAM_CONTENT = [
 
 
 export default function (){
-    const {selectedObject, contents} = useSelector(state => state.general);
-    const disabled = selectedObject.type !== "server";
+    const {contents} = useSelector(state => state.general);
+    const {activeServer} = useSelector(state => state.treeReducer);
+    const disabled = activeServer.type !== "server";
     const connection = useSelector(state => state.dialog.connection);
 
     const dispatch = useDispatch();
@@ -31,22 +33,28 @@ export default function (){
             label: 'Show Host Dashboard',
         },
         {
+            label: 'Dashboard Config',
+            onClick: ()=>{
+                dispatch(setDashboardConfig({open: true, server: activeServer}));
+            }
+        },
+        {
             label: 'Server Version'
         },
         {
             label: 'Properties',
-            disabled: !selectedObject.type,
+            disabled: !activeServer.type,
 
         },
         {
             label: 'Config Params',
-            disabled: !selectedObject.type,
+            disabled: !activeServer.type,
             children: CONFIG_PARAM_CONTENT.map(param=>{
                 return {...param,
                         onClick:()=>{
                             const checkObject = contents.find(item => item.key === param.key) || false
                             if(!checkObject){
-                                dispatch(addContents({ ...selectedObject, ...param, children: param.screen}))
+                                dispatch(addContents({ ...activeServer, ...param, children: param.screen}))
                             }
                             dispatch(setActivePanel(param.key))
                         }

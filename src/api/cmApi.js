@@ -13,7 +13,6 @@ export const requestCMAPI = (server, payload)=>{
 
 export const revokeLogin = async (server) => {
     try {
-        console.log("revoke login");
         await axios.post("/api/proxy/cms-auth/login", server) // revoke session/token
         return true
     } catch (retryError) {

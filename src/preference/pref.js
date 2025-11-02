@@ -1,5 +1,5 @@
 import {getLocalStorage, setLocalStorage} from "@/utils/storage";
-import {prefAutoStartupDatabase} from "@/preference/variable";
+import {prefAutoStartupDatabase, prefIntervalDashboard} from "@/preference/variable";
 import {nanoid} from "nanoid";
 
 
@@ -14,7 +14,6 @@ export const setPrefAutoStartupDatabase = (node)=>{
 
 }
 
-
 export const deletePrefAutoStartupDatabase = (node)=>{
     const key = `${node.serverId}.${node.database}`
     const prev = getLocalStorage(prefAutoStartupDatabase);
@@ -26,4 +25,19 @@ export const deletePrefAutoStartupDatabase = (node)=>{
 
 export const getPrefAutoStartupDatabase = ()=>{
    return getLocalStorage(prefAutoStartupDatabase)
+}
+
+
+export const setIntervalDashboard = (node, value)=>{
+    const payload = {[node.uid]: value}
+    const prev = getLocalStorage(prefIntervalDashboard);
+    if(prev){
+        setLocalStorage(prefIntervalDashboard, {...prev, ...payload})
+    }else{
+        setLocalStorage(prefIntervalDashboard, payload)
+    }
+}
+
+export const getIntervalDashboard = ()=>{
+    return getLocalStorage(prefIntervalDashboard) || {};
 }

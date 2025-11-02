@@ -10,17 +10,17 @@ import {useSelector} from "react-redux";
 
 
 
-const getItems = (panelStyle) => [
+const getItems = (panelStyle, props) => [
     {
         key: '1',
         label: <b>Database Volumes</b>,
-        children: <DatabaseVolumes />,
+        children: <DatabaseVolumes {...props}/>,
         style: panelStyle,
     },
     {
         key: '2',
         label: <b>Brokers</b>,
-        children: <Brokers />,
+        children: <Brokers {...props}/>,
         style: panelStyle,
     },
     // {
@@ -32,17 +32,17 @@ const getItems = (panelStyle) => [
     {
         key: '4',
         label: <b>Databases</b>,
-        children: <Databases />,
+        children: <Databases {...props}/>,
         style: panelStyle,
     },
     {
         key: '5',
         label: <b>System Info</b>,
-        children: <SystemInfo/>,
+        children: <SystemInfo {...props}/>,
         style: panelStyle,
     },
 ];
-const Dashboard = () => {
+const Dashboard = (props) => {
     const { token } = theme.useToken();
     const {activeServer} = useSelector((state) => state.treeReducer);
     const panelStyle = {
@@ -58,7 +58,7 @@ const Dashboard = () => {
             bordered={false}
             defaultActiveKey={['1', '2', '3', '4', '5']}
             expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
-            items={getItems(panelStyle)}
+            items={getItems(panelStyle, props)}
         />
     );
 };

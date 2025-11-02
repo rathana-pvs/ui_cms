@@ -5,16 +5,9 @@ import {LogoutOutlined, UserDeleteOutlined} from "@ant-design/icons";
 import {nanoid} from "nanoid";
 import {useTranslations} from "next-intl";
 import {useDispatch, useSelector} from "react-redux";
-// import FileMenu from "@/components/common/header/FileMenu";
-// import ToolMenu from "@/components/common/header/ToolMenu/ToolMenu";
 import ActionMenu from "@/components/common/header/ActionMenu";
 import HelpMenu from "@/components/common/header/HelpMenu";
 import FileMenu from "@/components/common/header/FileMenu";
-// import FileMenu from "@/components/common/header/FileMenu";
-// import ToolMenu from "@/components/common/header/ToolMenu/ToolMenu";
-// import ActionMenu from "@/components/common/header/ActionMenu";
-// import HelpMenu from "@/components/common/header/HelpMenu";
-// import {setLocale} from "@/state/generalSlice";
 import { useRouter, usePathname } from "next/navigation";
 export default function () {
     const router = useRouter();
