@@ -15,7 +15,7 @@ const DashboardConfig = () => {
     const [form] = Form.useForm();
     const {server} = dashboardConfig;
     const handleSave = () => {
-        setIntervalDashboard(server, form.getFieldValue("interval"))
+        setIntervalDashboard(form.getFieldValue("interval"))
         handleClose()
     }
     const handleClose = () => {
@@ -33,6 +33,7 @@ const DashboardConfig = () => {
 
     return (
         <Modal
+            width={400}
             title="Dashboard Config"
             open={dashboardConfig.open}
             onCancel={handleClose}

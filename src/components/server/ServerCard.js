@@ -19,7 +19,7 @@ const card_decor = {
 
 
 
-export default function ServerCard({title,address, port, color, status, onContextMenu, onClick}) {
+export default function ServerCard({title, address, port, color, status, onContextMenu, onClick}) {
     const router = useRouter();
     const handleClick = () => {
         // router.push("/home");

@@ -3,6 +3,7 @@ import { Space, Table, Tag } from 'antd';
 import {useSelector} from "react-redux";
 import styles from '@/components/contents/dashboard/dashboard.module.css'
 import {getDatabasesAPI, getResponse} from "@/api/cmApi";
+import {getIntervalDashboard} from "@/preference/pref";
 
 const columns = [
     {
@@ -46,11 +47,12 @@ const getSizeFormat = (size)=>{
 }
 
 
-export default function (){
+export default function (props){
+    const {activePanel} = useSelector(state => state.general);
     const {activeServer} = useSelector(state=>state.treeReducer);
     const [dataSource, setDataSource] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    let intervalId = null;
     const getVolumeColumn = (dbSpace, type)=>{
         let totalPage = 0
         let freePage = 0
@@ -137,6 +139,19 @@ export default function (){
 
     },[])
 
+    useEffect(() => {
+        if(intervalId){
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+        if(props.uniqueKey === activePanel){
+            const interval = getIntervalDashboard()
+            if(interval){
+                const value = parseInt(interval)
+                intervalId = setInterval(getSpaceInfo, value * 1000)
+            }
+        }
+    },[activePanel])
 
     return(
     <div className={styles.volume}>

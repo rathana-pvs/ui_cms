@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from "react";
 import {Button, Modal, Table} from "antd";
 import {useDispatch, useSelector} from "react-redux";
-import {setExportHost} from "@/state/dialogSlice";
 import {nanoid} from "nanoid";
+import {setExportHost} from "@/store/dialogReducer";
 
 
 const columns =  [
     {
         title: 'Host Name',
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'alias',
+        key: 'alias',
     },
     {
         title: 'Host Port',
@@ -18,13 +18,13 @@ const columns =  [
     },
     {
         title: 'Host Address',
-        dataIndex: 'host',
-        key: 'host',
+        dataIndex: 'address',
+        key: 'address',
     },
     {
         title: 'User Name',
-        dataIndex: 'username',
-        key: 'username',
+        dataIndex: 'user',
+        key: 'user',
     },
 ]
 
@@ -32,7 +32,7 @@ const columns =  [
 
 export default function (){
 
-    const {servers} = useSelector(state => state);
+    const {servers} = useSelector(state => state.treeReducer);
     const {exportHost} = useSelector(state => state.dialog);
     const [dataSource, setDataSource] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -43,7 +43,7 @@ export default function (){
         let content = ``
         for(let key of selectedRowKeys){
             let server = servers.find(res=>res.serverId===key)
-            content += `\t<host address="${server.host}" id="${server.key}" jdbcDriver="Auto Detect" name="${server.title}" port="${server.port}" soTimeOut="10000" user="${server.id}"/>\n`
+            content += `\t<host address="${server.address}" jdbcDriver="Auto Detect" name="${server.title}" port="${server.port}" soTimeOut="10000" user="${server.id}"/>\n`
         }
         return `<?xml version="1.0" encoding="UTF-8"?>
 <hosts>
@@ -72,10 +72,10 @@ ${content}
     useEffect(()=>{
         let data = servers.map(res=>{
             return {
-                name: res.name,
+                alias: res.alias,
                 port: res.port,
-                host: res.host,
-                username: res.id,
+                address: res.address,
+                user: res.id,
                 id: nanoid(4),
                 key: res.serverId,
             }
@@ -87,7 +87,6 @@ ${content}
     const rowSelection = {
         selectedRowKeys,
         onChange: (keys) => {
-
             setSelectedRowKeys(keys);
         },
     };

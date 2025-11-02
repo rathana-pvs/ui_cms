@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {Button, Input, message, Modal, Table} from "antd";
 import {useDispatch, useSelector} from "react-redux";
-import {setExportHost, setImportHost} from "@/state/dialogSlice";
 import {nanoid} from "nanoid";
 import xml2js from "xml2js";
 import {createServerFormat, setLocalStorage} from "@/utils/storage";
-import {setServer} from "@/state/serverSlice";
+import {setImportHost} from "@/store/dialogReducer";
+import {setServers} from "@/store/treeReducer";
+import {addHostAPI, getHostsAPI} from "@/api/cmApi";
+import {getServerFormat} from "@/utils/navigation";
+
 
 
 const columns =  [
@@ -35,7 +38,7 @@ const columns =  [
 
 export default function (){
 
-    const {servers} = useSelector(state => state);
+    const {servers} = useSelector(state => state.treeReducer);
     const {importHost} = useSelector(state => state.dialog);
     const [dataSource, setDataSource] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -93,19 +96,20 @@ export default function (){
 
 
     const handleOk = async () => {
-        let saveObject = []
+        let allRequest = []
         for(let key of selectedRowKeys) {
             const server = dataSource.find(item => item.id === key)
-            saveObject.push(createServerFormat({
-                name: server.name,
+            allRequest.push(addHostAPI({
+                id: server.user,
+                alias: server.name,
+                address: server.address,
                 port: server.port,
-                host: server.address,
-                id: server.user
-            }))
+            }));
         }
-
-        dispatch(setServer([...servers, ...saveObject]))
-        setLocalStorage("connections", [...servers, ...saveObject]);
+        await Promise.all(allRequest);
+        const responseHost = await getHostsAPI()
+        const newServers = responseHost.map(item=>getServerFormat(item));
+        dispatch(setServers(newServers));
         handleClose()
     };
 

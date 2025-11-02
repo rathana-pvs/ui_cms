@@ -118,12 +118,11 @@ export default function (props) {
             intervalId = null;
         }
         if(props.uniqueKey === activePanel){
-            const intervals = getIntervalDashboard()
-            const value = intervals[activeServer.uid]
-            const parsed = value != null ? parseInt(value) : 0;
-            console.log(parsed);
-            if(parsed > 0){
-                intervalId = setInterval(getRefreshData, parsed * 1000)
+            const interval = getIntervalDashboard()
+            if(interval){
+                const value = parseInt(interval)
+                console.log(value)
+                intervalId = setInterval(getRefreshData, value * 1000)
             }
         }
     },[activePanel])

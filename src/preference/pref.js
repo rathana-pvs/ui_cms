@@ -28,16 +28,10 @@ export const getPrefAutoStartupDatabase = ()=>{
 }
 
 
-export const setIntervalDashboard = (node, value)=>{
-    const payload = {[node.uid]: value}
-    const prev = getLocalStorage(prefIntervalDashboard);
-    if(prev){
-        setLocalStorage(prefIntervalDashboard, {...prev, ...payload})
-    }else{
-        setLocalStorage(prefIntervalDashboard, payload)
-    }
+export const setIntervalDashboard = (value)=>{
+    localStorage.setItem(prefIntervalDashboard, value)
 }
 
 export const getIntervalDashboard = ()=>{
-    return getLocalStorage(prefIntervalDashboard) || {};
+    return localStorage.getItem(prefIntervalDashboard);
 }
