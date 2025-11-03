@@ -144,3 +144,12 @@ export const getBrokerStatusAPI = async (node, data) => {
     }
     return {success: false};
 }
+
+export const getAllSystemParamAPI = async (node, data) => {
+    let payload = {
+        task: "getallsysparam",
+        ...data
+    }
+    const response = await getResponse(node, payload)
+    return {result: response.conflist[0].confdata, success: response.success}
+}

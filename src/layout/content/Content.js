@@ -23,7 +23,8 @@ const Content = () => {
         if(contents.length > 1) {
             const activeKey = contents.at(-2).key;
             dispatch(setActivePanel(activeKey));
-
+        }else {
+            dispatch(setActivePanel(""));
         }
         dispatch(deleteContents(targetKey));
 

@@ -4,13 +4,13 @@ import {useDispatch, useSelector} from "react-redux";
 
 import styles from "@/components/common/modal/dialog.module.css"
 
-import {getResponse} from "@/api";
 import {setVersion} from "@/store/dialogReducer";
+import {getResponse} from "@/api/cmApi";
 
 
 export default function (){
 
-    const {selectedObject} = useSelector(state => state.general);
+    const {activeServer} = useSelector(state => state.treeReducer);
     const {version} = useSelector(state => state.dialog);
     const dispatch = useDispatch();
     const [versionDetail, setVersionDetail] = useState({});
@@ -28,7 +28,7 @@ export default function (){
     useEffect(() => {
         if(version){
 
-            getResponse(selectedObject, {task:"getcmsenv"}).then(res=>{
+            getResponse(activeServer, {task:"getcmsenv"}).then(res=>{
                 console.log(res);
                 if(res.success){
                     setVersionDetail(res);

@@ -15,6 +15,7 @@ import ActionHeader from "@/layout/action/ActionHeader";
 import DashboardConfig from "@/components/common/modal/DashboardConfig";
 import ExportHost from "@/components/common/modal/ExportHost";
 import ImportHost from "@/components/common/modal/ImportHost";
+import LoadingScreen from "@/components/common/modal/LoadingScreen";
 // import AboutCubrid from "@/components/common/modal/AboutCubrid";
 // import Property from "@/components/common/modal/property/Property";
 // import NewConnection from "@/components/ui/dialogs/NewConnection";
@@ -91,7 +92,7 @@ export const MainLayout = (props)=>{
                 <ExportHost/>
                 <ImportHost/>
                 {/*/!*<DBLogin/>*!/*/}
-                {/*/!*<LoadingScreen/>*!/*/}
+                <LoadingScreen/>
                 {/*<CreateDatabase/>*/}
                 {/*/!*<UserManagement/>*!/*/}
                 <DashboardConfig/>

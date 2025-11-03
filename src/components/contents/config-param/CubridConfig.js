@@ -11,7 +11,8 @@ import {
     setUnsavedPanels
 } from "@/store/generalReducer";
 import ConfirmAction from "@/components/common/modal/ConfirmAction";
-import {getAllSystemParamAPI, getResponse} from "@/api";
+import {getAllSystemParamAPI, getResponse} from "@/api/cmApi";
+
 
 const CodeEditorPage = () => {
     const {contents, activePanel, closePanelKey, unsavedPanels} = useSelector(state => state.general);

@@ -269,7 +269,8 @@
 .ant-tree-title,
 .ant-tabs-tab,
 .ant-collapse,
-.ant-layout
+.ant-layout,
+.ant-modal-body
 {
     font-weight: 500 !important;
     font-size: 0.8125rem !important; /* 13px */

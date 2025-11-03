@@ -31,10 +31,10 @@
 /*}*/
 
 
-/*.db__text__title{*/
-/*    font-weight: 500;*/
-/*    color: var(--primary-color);*/
-/*}*/
+.db__text__title{
+    font-weight: 500;
+    color: var(--color-text);
+}
 
 /*.db__content{*/
 /*    border: 1px solid var(--border);*/

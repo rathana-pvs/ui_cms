@@ -1,24 +1,25 @@
-import React, {useEffect, useState} from 'react';
-import styles from '@/components/contents/dashboard/dashboard.module.css'
-import {Checkbox, Table, } from 'antd';
-import {useSelector} from "react-redux";
-import {nanoid} from "nanoid";
+import React, { useEffect, useRef, useState } from 'react';
+import styles from '@/components/contents/dashboard/dashboard.module.css';
+import { Checkbox, Table } from 'antd';
+import { useSelector } from "react-redux";
+import { nanoid } from "nanoid";
 import {
     deletePrefAutoStartupDatabase,
     getIntervalDashboard,
     getPrefAutoStartupDatabase,
     setPrefAutoStartupDatabase
 } from "@/preference/pref";
-import {getDatabasesAPI} from "@/api/cmApi";
+import { getDatabasesAPI } from "@/api/cmApi";
 
-
-
-export default function (props){
-    const {activePanel} = useSelector(state => state.general);
-    const {activeServer} = useSelector(state=>state.treeReducer);
+export default function DatabaseDashboard(props) {
+    const { activePanel } = useSelector(state => state.general);
+    const { activeServer } = useSelector(state => state.treeReducer);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    let intervalId = null;
+
+    // ✅ useRef to store the interval ID safely
+    const intervalRef = useRef(null);
+
     const columns = [
         {
             title: 'Database',
@@ -29,17 +30,18 @@ export default function (props){
             title: 'Auto Startup',
             dataIndex: 'auto',
             key: 'auto',
-            render: (value, record) => {
-
-                return <Checkbox defaultChecked={value} onClick={({target}) => {
-                    if (target.checked) {
-                        setPrefAutoStartupDatabase(record);
-                    }else {
-                        deletePrefAutoStartupDatabase(record);
-                    }
-
-                }}/>
-            },
+            render: (value, record) => (
+                <Checkbox
+                    defaultChecked={value}
+                    onClick={({ target }) => {
+                        if (target.checked) {
+                            setPrefAutoStartupDatabase(record);
+                        } else {
+                            deletePrefAutoStartupDatabase(record);
+                        }
+                    }}
+                />
+            ),
         },
         {
             title: 'Status',
@@ -49,50 +51,66 @@ export default function (props){
     ];
 
     const getRefreshData = async () => {
-        getDatabasesAPI(activeServer).then(response => {
-            if(response.success){
-                let prefAuto = getPrefAutoStartupDatabase();
-                setData(response.result?.map(res=>{
-                    let prefKey =`${activeServer.uid}.${res.dbname}`
-                    return {
-                        serverId: activeServer.uid,
-                        key: nanoid(4),
-                        database: res.dbname,
-                        auto: prefAuto?.includes(prefKey),
-                        status: res.status === "active" ? "running" : "stopped",
-                    }
-                }))
-            }
+        if (!activeServer?.uid) return;
 
-            setLoading(false)
-        })
-    }
+        const response = await getDatabasesAPI(activeServer);
+        if (response.success) {
+            const prefAuto = getPrefAutoStartupDatabase();
+            const newData = response.result?.map(res => {
+                const prefKey = `${activeServer.uid}.${res.dbname}`;
+                return {
+                    serverId: activeServer.uid,
+                    key: nanoid(4),
+                    database: res.dbname,
+                    auto: prefAuto?.includes(prefKey),
+                    status: res.status === "active" ? "running" : "stopped",
+                };
+            });
+            setData(newData);
+        }
+        setLoading(false);
+    };
 
+    // Run once initially
     useEffect(() => {
         if (activeServer.uid) {
-            getRefreshData()
+            getRefreshData();
         }
-    },[])
+    }, []);
 
-
+    // Handle interval updates when panel changes
     useEffect(() => {
-        if(intervalId){
-            clearInterval(intervalId);
-            intervalId = null;
+        // ✅ clear old interval
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
         }
-        if(props.uniqueKey === activePanel){
-            const interval = getIntervalDashboard()
-            if(interval){
-                const value = parseInt(interval)
-                intervalId = setInterval(getRefreshData, value * 1000)
+
+        // ✅ start a new one if this panel is active
+        if (props.uniqueKey === activePanel) {
+            const interval = getIntervalDashboard();
+            if (interval) {
+                const value = parseInt(interval, 10);
+                intervalRef.current = setInterval(getRefreshData, value * 1000);
             }
         }
-    },[activePanel])
 
-    return(
+        // ✅ cleanup when component unmounts
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, [activePanel]);
+
+    return (
         <div className={styles.database}>
-            <Table  pagination={false} loading={loading} columns={columns} dataSource={data} />
+            <Table
+                pagination={false}
+                loading={loading}
+                columns={columns}
+                dataSource={data}
+            />
         </div>
-
-    )
+    );
 }

@@ -44,34 +44,17 @@ export default function({server, clientX, clientY, open, onClose}) {
 
         },
         {
-            label: 'Export Connections to JDBC/CCI URL',
-            key: nanoid(4),
-            icon: <DeleteOutlined style={{color: 'var(--danger-color)'}} />,
-
-        },
-        {
             label: 'Change Manager\'s Password',
             key: nanoid(4),
             icon: <DeleteOutlined style={{color: 'var(--danger-color)'}} />,
 
         },
         {
-            label: 'Show Host Dashboard',
-            key: nanoid(4),
-            icon: <DeleteOutlined style={{color: 'var(--danger-color)'}} />,
-            onClick:()=>{
-                // dispatch(addContents(
-                //     {...node, label:"dashboard", children: <Dashboard/>,}
-                //     ))
-                // dispatch(setActivePanel(node.key))
-            }
-        },
-        {
             label: 'Server Version',
             key: nanoid(4),
             icon: <DeleteOutlined style={{color: 'var(--danger-color)'}} />,
             onClick: ()=> {
-                // dispatch(setVersion(true))
+                dispatch(setVersion(true))
             }
         },
         {
@@ -87,8 +70,8 @@ export default function({server, clientX, clientY, open, onClose}) {
             key: nanoid(4),
             icon: <DeleteOutlined style={{color: 'var(--danger-color)'}} />,
             onClick: ()=> {
-                // dispatch(setUnifySetting({open: true, node}))
-                //
+                dispatch(setUnifySetting({open: true, server}))
+
             }
 
         },

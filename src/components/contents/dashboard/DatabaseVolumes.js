@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import { Space, Table, Tag } from 'antd';
-import {useSelector} from "react-redux";
-import styles from '@/components/contents/dashboard/dashboard.module.css'
-import {getDatabasesAPI, getResponse} from "@/api/cmApi";
-import {getIntervalDashboard} from "@/preference/pref";
+import React, { useEffect, useRef, useState } from 'react';
+import { Table } from 'antd';
+import { useSelector } from "react-redux";
+import styles from '@/components/contents/dashboard/dashboard.module.css';
+import { getDatabasesAPI, getResponse } from "@/api/cmApi";
+import { getIntervalDashboard } from "@/preference/pref";
 
 const columns = [
     {
@@ -24,139 +24,154 @@ const columns = [
     {
         title: 'Active log',
         key: 'activeLog',
-        dataIndex: 'activeLog'
+        dataIndex: 'activeLog',
     },
     {
         title: 'Archive Log',
         key: 'archiveLog',
         dataIndex: 'archiveLog',
-    }
+    },
 ];
 
-
-const getSizeFormat = (size)=>{
-    if(size >= 1024 ** 3){
-        return `${(size/1024**3).toFixed(0)}GB`
-    }else if(size>=1024**2){
-        return `${(size/1024**2).toFixed(0)}MB`;
-    }else if(size>=1024){
-        return `${(size/1024**2).toFixed(0)}KB`;
-    }else{
+const getSizeFormat = (size) => {
+    if (size >= 1024 ** 3) {
+        return `${(size / 1024 ** 3).toFixed(0)}GB`;
+    } else if (size >= 1024 ** 2) {
+        return `${(size / 1024 ** 2).toFixed(0)}MB`;
+    } else if (size >= 1024) {
+        return `${(size / 1024).toFixed(0)}KB`;
+    } else {
         return `${size}B`;
     }
-}
+};
 
-
-export default function (props){
-    const {activePanel} = useSelector(state => state.general);
-    const {activeServer} = useSelector(state=>state.treeReducer);
+export default function VolumeDashboard(props) {
+    const { activePanel } = useSelector(state => state.general);
+    const { activeServer } = useSelector(state => state.treeReducer);
     const [dataSource, setDataSource] = useState([]);
     const [loading, setLoading] = useState(true);
-    let intervalId = null;
-    const getVolumeColumn = (dbSpace, type)=>{
-        let totalPage = 0
-        let freePage = 0
+
+    // ✅ persistent interval storage
+    const intervalRef = useRef(null);
+
+    const getVolumeColumn = (dbSpace, type) => {
+        let totalPage = 0;
+        let freePage = 0;
         let pageSize = parseInt(dbSpace.pagesize);
-        for(const space of dbSpace.spaceinfo){
-            if(space.type === type){
-                totalPage = totalPage + parseInt(space.totalpage)
-                freePage = freePage + parseInt(space.freepage)
+        for (const space of dbSpace.spaceinfo) {
+            if (space.type === type) {
+                totalPage += parseInt(space.totalpage);
+                freePage += parseInt(space.freepage);
             }
         }
-        if(totalPage > 0){
-            return `${getSizeFormat((totalPage - freePage) * pageSize)} / ${getSizeFormat(totalPage*pageSize)}
-             / ${(freePage*100/totalPage).toFixed(0)}%`
+        if (totalPage > 0) {
+            return `${getSizeFormat((totalPage - freePage) * pageSize)} / ${getSizeFormat(totalPage * pageSize)} / ${(freePage * 100 / totalPage).toFixed(0)}%`;
         }
-        return "-"
-    }
+        return "-";
+    };
 
-    const getLogColumn = (dbSpace, type)=>{
-        let totalPage = 0
+    const getLogColumn = (dbSpace, type) => {
+        let totalPage = 0;
         let pageSize = parseInt(dbSpace.pagesize);
-        for(const space of dbSpace.spaceinfo){
-            if(space.type === type){
-                totalPage = totalPage + parseInt(space.totalpage)
+        for (const space of dbSpace.spaceinfo) {
+            if (space.type === type) {
+                totalPage += parseInt(space.totalpage);
             }
         }
-        if(totalPage > 0){
-            return getSizeFormat(totalPage * pageSize)
+        if (totalPage > 0) {
+            return getSizeFormat(totalPage * pageSize);
         }
-        return "-"
-    }
-
+        return "-";
+    };
 
     const getSpaceInfo = async () => {
-        const resDB = await getDatabasesAPI(activeServer);
-        let permanent = "-"
-        let temporary = "-"
-        let activeLog = "-"
-        let archiveLog = "-"
-        let tempData = []
-        if(resDB.success){
-            const allRequest = resDB.result?.filter(res=>res.status === "active").map(res=>{
-                return getResponse(activeServer, {
-                    task: "dbspaceinfo",
-                    dbname: res.dbname
-                })
-            })
+        if (!activeServer?.uid) return;
 
-            const responses = await Promise.all(allRequest)
-            for(const result of responses){
-                if(result.status === "success"){
-                    for(const spaceInfo of result.spaceinfo){
-                        if(spaceInfo.type === "PERMANENT"){
-                            permanent = getVolumeColumn(result, spaceInfo.type)
-                        }else if(spaceInfo.type === "TEMPORARY"){
-                            temporary = getVolumeColumn(result, spaceInfo.type)
-                        }else if(spaceInfo.type === "Active_log"){
-                            activeLog = getLogColumn(result, spaceInfo.type)
-                        }else if(spaceInfo.type === "Archive_log"){
-                            archiveLog = getLogColumn(result, spaceInfo.type)
+        const resDB = await getDatabasesAPI(activeServer);
+        let tempData = [];
+
+        if (resDB.success) {
+            const allRequest = resDB.result
+                ?.filter(res => res.status === "active")
+                .map(res => getResponse(activeServer, {
+                    task: "dbspaceinfo",
+                    dbname: res.dbname,
+                }));
+
+            const responses = await Promise.all(allRequest);
+
+            for (const result of responses) {
+                if (result.status === "success") {
+                    let permanent = "-";
+                    let temporary = "-";
+                    let activeLog = "-";
+                    let archiveLog = "-";
+
+                    for (const spaceInfo of result.spaceinfo) {
+                        if (spaceInfo.type === "PERMANENT") {
+                            permanent = getVolumeColumn(result, spaceInfo.type);
+                        } else if (spaceInfo.type === "TEMPORARY") {
+                            temporary = getVolumeColumn(result, spaceInfo.type);
+                        } else if (spaceInfo.type === "Active_log") {
+                            activeLog = getLogColumn(result, spaceInfo.type);
+                        } else if (spaceInfo.type === "Archive_log") {
+                            archiveLog = getLogColumn(result, spaceInfo.type);
                         }
                     }
+
+                    tempData.push({
+                        database: result.dbname,
+                        permanent,
+                        temporary,
+                        activeLog,
+                        archiveLog,
+                    });
                 }
-                tempData.push({
-                    database: result.dbname,
-                    permanent,
-                    temporary,
-                    activeLog,
-                    archiveLog
-                })
             }
-
-        }
-        setLoading(false)
-        setDataSource(tempData)
-
-
-
-    }
-
-    useEffect(()=>{
-        if(activeServer.uid){
-            getSpaceInfo()
         }
 
-    },[])
+        setDataSource(tempData);
+        setLoading(false);
+    };
 
+    // Run once on mount
     useEffect(() => {
-        if(intervalId){
-            clearInterval(intervalId);
-            intervalId = null;
+        if (activeServer.uid) getSpaceInfo();
+    }, []);
+
+    // Re-run interval when activePanel changes
+    useEffect(() => {
+        // ✅ Clear old interval
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
         }
-        if(props.uniqueKey === activePanel){
-            const interval = getIntervalDashboard()
-            if(interval){
-                const value = parseInt(interval)
-                intervalId = setInterval(getSpaceInfo, value * 1000)
+
+        // ✅ Start new interval if this panel is active
+        if (props.uniqueKey === activePanel) {
+            const interval = getIntervalDashboard();
+            if (interval) {
+                const value = parseInt(interval, 10);
+                intervalRef.current = setInterval(getSpaceInfo, value * 1000);
             }
         }
-    },[activePanel])
 
-    return(
-    <div className={styles.volume}>
-        <Table pagination={false} loading={loading} columns={columns} dataSource={dataSource} />
-    </div>
-    )
+        // ✅ Cleanup when unmounting
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, [activePanel]);
 
+    return (
+        <div className={styles.volume}>
+            <Table
+                pagination={false}
+                loading={loading}
+                columns={columns}
+                dataSource={dataSource}
+            />
+        </div>
+    );
 }

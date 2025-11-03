@@ -9,13 +9,13 @@ import CMConfig from "@/components/contents/config-param/CMConfig";
 import CubridConfig from "@/components/contents/config-param/CubridConfig";
 import CubridBrokerConfig from "@/components/contents/config-param/CubridBrokerConfig";
 import {addContents, setActivePanel} from "@/store/generalReducer";
-import {setDashboardConfig} from "@/store/dialogReducer";
+import {setDashboardConfig, setVersion} from "@/store/dialogReducer";
 
 
 const CONFIG_PARAM_CONTENT = [
-    {label: "Edit Cubrid Config", screen: <CubridConfig/>, key: nanoid(8)},
-    {label: "Edit Broker Config", screen: <CubridBrokerConfig/>, key: nanoid(8)},
-    {label: "Cubrid Manager Config", screen: <CMConfig/>, key: nanoid(8)},
+    {label: "Edit Cubrid Config", screen: CubridConfig, key: nanoid(8)},
+    {label: "Edit Broker Config", screen: CubridBrokerConfig, key: nanoid(8)},
+    {label: "Cubrid Manager Config", screen: CMConfig, key: nanoid(8)},
 ]
 
 
@@ -39,7 +39,10 @@ export default function (){
             }
         },
         {
-            label: 'Server Version'
+            label: 'Server Version',
+            onClick: ()=> {
+                dispatch(setVersion(true))
+            }
         },
         {
             label: 'Properties',
