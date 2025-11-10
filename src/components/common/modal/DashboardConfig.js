@@ -25,7 +25,7 @@ const DashboardConfig = () => {
         if(dashboardConfig.open){
             const values = getIntervalDashboard();
             if(values){
-                form.setFieldValue("interval", values[server.uid]);
+                form.setFieldValue("interval", values);
             }
         }
 

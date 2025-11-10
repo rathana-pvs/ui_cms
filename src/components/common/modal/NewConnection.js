@@ -9,7 +9,7 @@ import 'antd/dist/reset.css';
 import {setServers} from "@/store/treeReducer";
 import {setConnection} from "@/store/dialogReducer";
 import {getServerFormat} from "@/utils/navigation";
-import {addHostAPI, getHostsAPI, updateHostAPI} from "@/api/cmApi";
+import {addHostAPI, getHostsAPI, updateHostAPI} from "@/lib/api/cmApi";
 export default function () {
     const {servers} = useSelector(state => state.treeReducer);
     const {connection} = useSelector(state => state.dialog);

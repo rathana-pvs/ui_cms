@@ -5,9 +5,9 @@ import {useDispatch, useSelector} from "react-redux";
 
 import {nanoid} from "nanoid";
 
-import CMConfig from "@/components/contents/config-param/CMConfig";
-import CubridConfig from "@/components/contents/config-param/CubridConfig";
-import CubridBrokerConfig from "@/components/contents/config-param/CubridBrokerConfig";
+import CMConfig from "@/components/composite/contents/config-param/CMConfig";
+import CubridConfig from "@/components/composite/contents/config-param/CubridConfig";
+import CubridBrokerConfig from "@/components/composite/contents/config-param/CubridBrokerConfig";
 import {addContents, setActivePanel} from "@/store/generalReducer";
 import {setDashboardConfig, setVersion} from "@/store/dialogReducer";
 

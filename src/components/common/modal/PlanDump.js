@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Modal, Form, Select, Button, Input, Row, Col, Checkbox} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import {setCopyDB, setLoading, setOptimizeDB, setPlanDump} from "@/state/dialogSlice";
-import styles from "@/components/ui/dialogs/dialog.module.css"
+import styles from "@/components/common/ui/dialogs/dialog.module.css"
 import {getCopyDB, getDatabases, getDBSize, getDBSpace, getOptimizeDB, getPlanDump, getTables} from "@/utils/api";
 import {getAPIParam} from "@/utils/utils";
 import {nanoid} from "nanoid";

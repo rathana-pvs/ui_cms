@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Modal, Form, Select, Button, Row, Input, Col, Checkbox, Radio} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import {setCreateDB, setLoading, setOptimizeDB} from "@/state/dialogSlice";
-import styles from "@/components/ui/dialogs/dialog.module.css"
+import styles from "@/components/common/ui/dialogs/dialog.module.css"
 import {
     getCheckDir,
     getCheckFile,
@@ -13,7 +13,7 @@ import {
     setCubridConfig, startDatabase, updateUser, updateUserDB
 } from "@/utils/api";
 import {getAPIParam, isEmptyString, isNotEmpty, replaceConfig, replaceLines} from "@/utils/utils";
-import EditableTable from "@/components/ui/tables/EditableTable";
+import EditableTable from "@/components/common/ui/tables/EditableTable";
 import {nanoid} from "nanoid";
 import * as Yup from "yup";
 import {isEmpty} from "lodash";

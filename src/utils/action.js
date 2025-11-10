@@ -1,4 +1,4 @@
-import {getResponse} from "@/api";
+import {getResponse} from "@/lib/api";
 import {getFromStore, selectTreeReducer} from "@/utils/getFromStore";
 import {setBrokers, setSubServers} from "@/store/treeReducer";
 import {setLoading} from "@/store/dialogReducer";

@@ -1,5 +1,5 @@
 import {Button, Divider, Table} from "antd";
-import EditableTable from "@/components/ui/tables/EditableTable";
+import EditableTable from "@/components/common/ui/tables/EditableTable";
 import {nanoid} from "nanoid";
 import React, {useEffect, useState} from "react";
 import {setLoading, setProperty} from "@/state/dialogSlice";

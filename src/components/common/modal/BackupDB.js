@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Checkbox, Col, Form, Input, Modal, Row, Select} from "antd";
 import {useDispatch, useSelector} from "react-redux";
-import styles from '@/components/ui/dialogs/dialog.module.css'
+import styles from '@/components/common/ui/dialogs/dialog.module.css'
 import {getBackupDB} from "@/utils/api";
 import {getAPIParam} from "@/utils/utils";
 import {setBackupDB, setLoading} from "@/state/dialogSlice";

@@ -1,5 +1,5 @@
 import {Button, Checkbox, Col, Divider, Form, Input, Radio, Row} from "antd";
-import styles from "@/components/ui/dialogs/dialog.module.css";
+import styles from "@/components/common/ui/dialogs/dialog.module.css";
 import {setLoading, setProperty} from "@/state/dialogSlice";
 import React, {useEffect, useState} from "react";
 import {getCubridConfig, setCubridConfig} from "@/utils/api";

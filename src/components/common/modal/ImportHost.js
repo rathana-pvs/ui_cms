@@ -6,7 +6,7 @@ import xml2js from "xml2js";
 import {createServerFormat, setLocalStorage} from "@/utils/storage";
 import {setImportHost} from "@/store/dialogReducer";
 import {setServers} from "@/store/treeReducer";
-import {addHostAPI, getHostsAPI} from "@/api/cmApi";
+import {addHostAPI, getHostsAPI} from "@/lib/api/cmApi";
 import {getServerFormat} from "@/utils/navigation";
 
 

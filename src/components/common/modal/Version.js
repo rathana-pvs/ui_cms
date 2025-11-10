@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import styles from "@/components/common/modal/dialog.module.css"
 
 import {setVersion} from "@/store/dialogReducer";
-import {getResponse} from "@/api/cmApi";
+import {getResponse} from "@/lib/api/cmApi";
 
 
 export default function (){

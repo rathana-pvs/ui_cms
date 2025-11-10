@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Button, Checkbox, Col, DatePicker, Form, Input, Modal, Radio, Row} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import {setLoading, setRestoreDB} from "@/state/dialogSlice";
-import styles from "@/components/ui/dialogs/dialog.module.css"
+import styles from "@/components/common/ui/dialogs/dialog.module.css"
 
 
 export default function () {

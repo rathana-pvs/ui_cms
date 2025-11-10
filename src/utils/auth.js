@@ -1,6 +1,6 @@
 import {getLocalStorage, setLocalStorage} from "@/utils/storage";
 import axios from "axios";
-import {loginAPI} from "@/api";
+import {loginAPI} from "@/lib/api";
 
 
 export const setToken = async ({host, port, id, password}) => {

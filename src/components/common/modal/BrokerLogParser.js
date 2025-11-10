@@ -2,14 +2,14 @@ import React, {useEffect, useState} from "react";
 import {Modal, Form, Input, Select, Checkbox, Button} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import {setBrokerParser, setCompactDB, setLoading, setUserDB} from "@/state/dialogSlice";
-import styles from "@/components/ui/dialogs/dialog.module.css"
+import styles from "@/components/common/ui/dialogs/dialog.module.css"
 import {getCompactDB} from "@/utils/api";
 import {extractSQL, getAPIParam, isEmptyString, isNotEmpty} from "@/utils/utils";
 import TextArea from "antd/es/input/TextArea";
 import {isNull} from "lodash";
 import {addContents, setActivePanel} from "@/state/generalSlice";
 import {TOP_TOOL, UNIFY_SETTING_CONTENT} from "@/utils/data";
-import SQLEditor from "@/components/ui/contents/editor/SQLEditor";
+import SQLEditor from "@/components/common/ui/contents/editor/SQLEditor";
 import {nanoid} from "nanoid";
 
 

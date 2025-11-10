@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import styles from "@/layout/layout.module.css"
+import styles from "@/components/layout/layout.module.css"
 export default function VerticalResizeLayout({onChangeHeight}) {
     const [topHeight, setTopHeight] = useState(200); // initial top height
     const containerRef = useRef(null);

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Modal, Form, Input, Select, Checkbox, Button} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import {setCompactDB, setLoading, setUserDB} from "@/state/dialogSlice";
-import styles from "@/components/ui/dialogs/dialog.module.css"
+import styles from "@/components/common/ui/dialogs/dialog.module.css"
 import {getCompactDB} from "@/utils/api";
 import {getAPIParam} from "@/utils/utils";
 

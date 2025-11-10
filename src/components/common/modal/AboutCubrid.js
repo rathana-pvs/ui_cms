@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Modal, Form, Select, Button} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import {setAbout, setLoading, setOptimizeDB} from "@/state/dialogSlice";
-import styles from "@/components/ui/dialogs/dialog.module.css"
+import styles from "@/components/common/ui/dialogs/dialog.module.css"
 import {getOptimizeDB, getTables} from "@/utils/api";
 import {getAPIParam} from "@/utils/utils";
 

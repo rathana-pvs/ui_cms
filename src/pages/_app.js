@@ -77,7 +77,7 @@ function AppWrapper({ Component, pageProps }) {
             colorPrimary: palette.primary,
             colorBgContainer: palette.background,
             colorText: palette.text,
-            fontsize: 13
+            fontSize: 13
         },
         algorithm: themeMode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
     };

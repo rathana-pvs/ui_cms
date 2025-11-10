@@ -1,5 +1,5 @@
 import {Button, Checkbox, Col, Divider, Form, Input, Radio, Row, Select, Space, Tabs} from "antd";
-import styles from '@/components/ui/dialogs/dialog.module.css'
+import styles from '@/components/common/ui/dialogs/dialog.module.css'
 import React, {useContext, useEffect, useRef, useState} from "react";
 import setData from "lodash/_setData";
 import {setLoading, setProperty} from "@/state/dialogSlice";
@@ -9,7 +9,7 @@ import {getAPIParam, getExtractConfig, parseBoolean, replaceConfig, replaceLine,
 import {value} from "lodash/seq";
 import TabPane from "antd/es/tabs/TabPane";
 import {nanoid} from "nanoid";
-import EditableTable from "@/components/ui/tables/EditableTable";
+import EditableTable from "@/components/common/ui/tables/EditableTable";
 
 const defaultConfig = {
     error_log_level: "notification",

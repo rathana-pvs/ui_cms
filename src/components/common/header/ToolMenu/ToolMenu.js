@@ -1,6 +1,6 @@
 
 import {Dropdown} from "antd";
-import styles from "@/components/ui/header/header.module.css";
+import styles from "@/components/common/ui/header/header.module.css";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -12,9 +12,9 @@ import {
 } from "@/utils/utils";
 import {setBrokerParser, setChangeCMPassword, setUserManagement} from "@/state/dialogSlice";
 import {addContents, setActivePanel} from "@/state/generalSlice";
-import SQLEditor from "@/components/ui/contents/editor/SQLEditor";
+import SQLEditor from "@/components/common/ui/contents/editor/SQLEditor";
 import {TOP_TOOL} from "@/utils/data";
-import ServiceDashboard from "@/components/ui/contents/dashboard/ServiceDashboard";
+import ServiceDashboard from "@/components/common/ui/contents/dashboard/ServiceDashboard";
 import {nanoid} from "nanoid";
 
 

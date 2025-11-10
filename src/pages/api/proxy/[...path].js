@@ -15,7 +15,7 @@ export default async function handler(req, res) {
                 Authorization: headers.authorization,
                 "Content-Type": "application/json",
             },
-            body: method !== "GET" && method !== "HEAD" && method !== "DELETE"
+            body: method !== "GET" && method !== "HEAD"
                 ? JSON.stringify(body)
                 : undefined,
             agent: httpsAgent, // works with node-fetch

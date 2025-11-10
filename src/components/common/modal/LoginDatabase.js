@@ -2,16 +2,10 @@ import React, {memo, useEffect, useRef, useState} from 'react';
 import {Button, Checkbox, Col, Form, Input, message, Modal, Row, Select, Space, Table} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import styles from '@/components/common/modal/dialog.module.css'
-import {getAPIParam} from "@/utils/utils";
 import {setDatabases, setSubDatabase} from "@/store/treeReducer";
 import {setLoginDB} from "@/store/dialogReducer";
-import {loginDatabaseAPI} from "@/api";
 import {getTemplateFormat} from "@/utils/navigation";
-
-
-
-
-
+import {loginDatabaseAPI} from "@/lib/api";
 
 
 

@@ -8,8 +8,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {setLoading, setProperty} from "@/store/dialogReducer";
 import {serverDisconnect} from "@/store/sharedAction";
 import {extractBroker, getAPIParam} from "@/utils/utils";
-import {getAllSystemParamAPI} from "@/api";
 import ManageBroker from "@/components/common/modal/property/ManageBroker";
+import {getAllSystemParamAPI} from "@/lib/api";
 // import ManageBroker from "@/components/common/modal/property/ManageBroker";
 
 export default function (){

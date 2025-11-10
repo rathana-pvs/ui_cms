@@ -1,7 +1,7 @@
 import {Tabs} from "antd";
 import TabPane from "antd/es/tabs/TabPane";
-import GeneralParam from "@/components/ui/dialogs/property/Common/GeneralParam";
-import AdvanceParam from "@/components/ui/dialogs/property/Common/AdvanceParam";
+import GeneralParam from "@/components/common/ui/dialogs/property/Common/GeneralParam";
+import AdvanceParam from "@/components/common/ui/dialogs/property/Common/AdvanceParam";
 
 
 export default function (){

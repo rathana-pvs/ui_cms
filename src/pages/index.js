@@ -1,7 +1,7 @@
 "use client"
 //
-import MainLayout from "@/layout/MainLayout";
-import Content from "@/layout/content/Content";
+import MainLayout from "@/components/layout/MainLayout";
+import Content from "@/components/layout/content/Content";
 
 const HomePage = () => {
     return (
