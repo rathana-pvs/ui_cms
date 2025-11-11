@@ -154,3 +154,11 @@ export const getAllSystemParamAPI = async (node, data) => {
     return {result: response.conflist[0].confdata, success: response.success}
 }
 
+export const setAllSystemParamAPI = async (node, data) => {
+    let payload = {
+        task: "setsysparam",
+        ...data
+    }
+    const response = await getResponse(node, payload)
+    return {success: response.success}
+}

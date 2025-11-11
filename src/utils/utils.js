@@ -238,89 +238,89 @@ export const setRememberPassword = (remember, serverId, connections)=>{
 //
 // }
 //
-// export const extractParam = (lines)=>{
-//     const result = {};
-//     const uniqueKeys = new Set();
-//     let currentSection = null;
+export const extractParam = (lines)=>{
+    const result = {};
+    const uniqueKeys = new Set();
+    let currentSection = null;
+
+    lines.forEach(line => {
+        const trimmed = line.trim();
+
+        // Detect section headers like [broker] or [%query_editor]
+        const sectionMatch = trimmed.match(/^\[(%?[\w_]+)]$/);
+        if (sectionMatch) {
+            currentSection = sectionMatch[1];
+            result[currentSection] = {};
+            return;
+        }
+
+        // Handle key=value lines
+        if (currentSection && trimmed.includes('=') && !trimmed.startsWith("#")) {
+            const [key, value] = trimmed.split('=');
+            const cleanKey = key.trim();
+            result[currentSection][cleanKey] = value.trim();
+            uniqueKeys.add(cleanKey);
+        }
+    });
+
+    return [result, uniqueKeys];
+}
 //
-//     lines.forEach(line => {
-//         const trimmed = line.trim();
-//
-//         // Detect section headers like [broker] or [%query_editor]
-//         const sectionMatch = trimmed.match(/^\[(%?[\w_]+)]$/);
-//         if (sectionMatch) {
-//             currentSection = sectionMatch[1];
-//             result[currentSection] = {};
-//             return;
-//         }
-//
-//         // Handle key=value lines
-//         if (currentSection && trimmed.includes('=') && !trimmed.startsWith("#")) {
-//             const [key, value] = trimmed.split('=');
-//             const cleanKey = key.trim();
-//             result[currentSection][cleanKey] = value.trim();
-//             uniqueKeys.add(cleanKey);
-//         }
-//     });
-//
-//     return [result, uniqueKeys];
-// }
-//
-// export const injectParam = (data) => {
-//
-//     // Extract dynamic section keys
-//     const sectionKeys = new Set();
-//
-//     data.forEach(row => {
-//         Object.keys(row).forEach(key => {
-//             if (key !== "key" && key !== "propertyName") {
-//                 sectionKeys.add(key);
-//             }
-//         });
-//     });
-//
-//     const lines = [
-//         "#",
-//         "# Copyright (C) 2009 Search Solution Corporation. All rights reserved by Search Solution.",
-//         "#",
-//         "#   This program is free software; you can redistribute it and/or modify",
-//         "#   it under the terms of the GNU General Public License as published by",
-//         "#   the Free Software Foundation; version 2 of the License.",
-//         "#",
-//         "#  This program is distributed in the hope that it will be useful,",
-//         "#  but WITHOUT ANY WARRANTY; without even the implied warranty of",
-//         "#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the",
-//         "#  GNU General Public License for more details.",
-//         "#",
-//         "#  You should have received a copy of the GNU General Public License",
-//         "#  along with this program; if not, write to the Free Software",
-//         "#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA",
-//         "",
-//         "#"
-//     ];
-//
-// // Sort section keys so "broker" appears first if present
-//     const sortedSections = Array.from(sectionKeys).sort((a, b) => {
-//         if (a === "broker") return -1;
-//         if (b === "broker") return 1;
-//         return a.localeCompare(b);
-//     });
-//
-// // Generate lines by section
-//     sortedSections.forEach(section => {
-//         lines.push(`[${section}]`);
-//         data.forEach(row => {
-//             const value = row[section];
-//             if (value && value !== "") {
-//                 lines.push(`${row.propertyName}=${value}`);
-//             }
-//         });
-//         lines.push("");
-//     });
-//     return lines
-// }
-//
-//
+export const injectParam = (data) => {
+
+    // Extract dynamic section keys
+    const sectionKeys = new Set();
+
+    data.forEach(row => {
+        Object.keys(row).forEach(key => {
+            if (key !== "key" && key !== "propertyName") {
+                sectionKeys.add(key);
+            }
+        });
+    });
+
+    const lines = [
+        "#",
+        "# Copyright (C) 2009 Search Solution Corporation. All rights reserved by Search Solution.",
+        "#",
+        "#   This program is free software; you can redistribute it and/or modify",
+        "#   it under the terms of the GNU General Public License as published by",
+        "#   the Free Software Foundation; version 2 of the License.",
+        "#",
+        "#  This program is distributed in the hope that it will be useful,",
+        "#  but WITHOUT ANY WARRANTY; without even the implied warranty of",
+        "#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the",
+        "#  GNU General Public License for more details.",
+        "#",
+        "#  You should have received a copy of the GNU General Public License",
+        "#  along with this program; if not, write to the Free Software",
+        "#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA",
+        "",
+        "#"
+    ];
+
+// Sort section keys so "broker" appears first if present
+    const sortedSections = Array.from(sectionKeys).sort((a, b) => {
+        if (a === "broker") return -1;
+        if (b === "broker") return 1;
+        return a.localeCompare(b);
+    });
+
+// Generate lines by section
+    sortedSections.forEach(section => {
+        lines.push(`[${section}]`);
+        data.forEach(row => {
+            const value = row[section];
+            if (value && value !== "") {
+                lines.push(`${row.propertyName}=${value}`);
+            }
+        });
+        lines.push("");
+    });
+    return lines
+}
+
+
 export const extractBroker = (lines)=>{
     const result = { comment: "" };
     let currentSection = null;
@@ -447,29 +447,29 @@ export const extractBroker = (lines)=>{
 // }
 //
 //
-// export const extractConfig = (lines)=>{
-//     const result = { comment: "" };
-//     let currentSection = null;
-//
-//     lines.forEach(line => {
-//         const trimmed = line.trim();
-//
-//         if (trimmed.startsWith("@")) {
-//             result.comment += trimmed + "\n";
-//         } else if (trimmed === "") {
-//             return;
-//         } else if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-//             currentSection = trimmed.slice(1, -1);
-//             result[currentSection] = {};
-//         } else if (trimmed.includes("=") && currentSection) {
-//             const [key, ...rest] = trimmed.split("=");
-//             result[currentSection][key.trim()] = rest.join("=").trim();
-//         }
-//     });
-//
-//     return result
-//
-// }
+export const extractConfig = (lines)=>{
+    const result = { comment: "" };
+    let currentSection = null;
+
+    lines.forEach(line => {
+        const trimmed = line.trim();
+
+        if (trimmed.startsWith("@")) {
+            result.comment += trimmed + "\n";
+        } else if (trimmed === "") {
+            return;
+        } else if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+            currentSection = trimmed.slice(1, -1);
+            result[currentSection] = {};
+        } else if (trimmed.includes("=") && currentSection) {
+            const [key, ...rest] = trimmed.split("=");
+            result[currentSection][key.trim()] = rest.join("=").trim();
+        }
+    });
+
+    return result
+
+}
 //
 // export const parseSize = (str) => {
 //     // Return null or unchanged input for invalid cases

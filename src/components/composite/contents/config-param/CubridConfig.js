@@ -1,17 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Editor from '@monaco-editor/react';
 // import {getAPIParam} from "@/utils/utils";
 import {useDispatch, useSelector} from "react-redux";
 import {setLoading} from "@/store/dialogReducer";
 import {
     deleteContents,
-    deleteSignalSavePanel,
+    deleteSignalSavePanel, deleteUnsavedPanels,
     setActivePanel,
     setClosePanelKey,
     setUnsavedPanels
 } from "@/store/generalReducer";
 import ConfirmAction from "@/components/common/modal/ConfirmAction";
-import {getAllSystemParamAPI, getResponse} from "@/lib/api/cmApi";
+import {getAllSystemParamAPI, getResponse, setAllSystemParamAPI} from "@/lib/api/cmApi";
 
 
 const CodeEditorPage = () => {
@@ -21,9 +21,11 @@ const CodeEditorPage = () => {
     const [server, setServer] = useState({})
     const [isChange, setIsChange] = useState(false);
     const [code, setCode] = useState('');
+    const activeRef = useRef(null);
+
 
     useEffect(() => {
-
+        activeRef.current = activePanel
         dispatch(setLoading(true))
 
         getAllSystemParamAPI(activeServer, {confname: "cubrid.conf"}).then(({result}) => {
@@ -49,18 +51,17 @@ const CodeEditorPage = () => {
 
 
     useEffect(()=>{
-            if(unsavedPanels.includes(closePanelKey)){
+            if(closePanelKey === activeRef.current){
                 ConfirmAction({
                     content: "Do you want to save changes?",
                     onOk: () => {
                         dispatch(setLoading(true))
-                        getResponse(activeServer, {
-                            task: "setsysparam",
+                        setAllSystemParamAPI(activeServer, {
                             confname: "cubrid.conf",
                             confdata: code.split("\r\n")})
                             .then(res =>{
                             dispatch(setLoading(false))
-                            if(res.status === "success") {
+                            if(res.success) {
                                 removePanel()
                             }
                         })
@@ -80,7 +81,8 @@ const CodeEditorPage = () => {
             dispatch(setActivePanel(activeKey));
         }
         dispatch(deleteContents(activePanel));
-        dispatch(setClosePanelKey(""));
+        dispatch(deleteUnsavedPanels(activePanel));
+        dispatch(setClosePanelKey(null));
     }
 
 

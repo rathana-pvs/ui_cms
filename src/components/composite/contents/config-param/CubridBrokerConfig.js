@@ -4,152 +4,146 @@ import { Table, Input, Form } from 'antd';
 
 import {useDispatch, useSelector} from "react-redux";
 import {nanoid} from "nanoid";
-import {deleteContents, deleteSignalSavePanel, setActivePanel, setUnsavedPanels} from "@/store/generalReducer";
-import {getAPIParam} from "@/utils/utils";
+import {
+    deleteContents,
+    deleteSignalSavePanel, deleteUnsavedPanels,
+    setActivePanel,
+    setClosePanelKey,
+    setUnsavedPanels
+} from "@/store/generalReducer";
+import {extractConfig, extractParam, getAPIParam, injectParam} from "@/utils/utils";
 import ConfirmAction from "@/components/common/modal/ConfirmAction";
 import {setLoading} from "@/store/dialogReducer";
-
-// import './table.css'; // Custom styling
-
-const EditableContext = React.createContext(null);
-
-const EditableRow = ({ index, ...props }) => {
-    const [form] = Form.useForm();
-    return (
-        <Form form={form} component={false}>
-            <EditableContext.Provider value={form}>
-                <tr {...props} />
-            </EditableContext.Provider>
-        </Form>
-    );
-};
-
-const EditableCell = (props) => {
-    const {
-        title,
-        editable,
-        children,
-        dataIndex,
-        record,
-        handleSave,
-        ...restProps
-    } = props;
-    const form = useContext(EditableContext);
-    const inputRef = useRef(null);
-    const [editing, setEditing] = useState(false);
-
-    useEffect(() => {
-        if (editing) inputRef.current?.focus();
-    }, [editing]);
+import {getAllSystemParamAPI, setAllSystemParamAPI} from "@/lib/api/cmApi";
+import EditableTable from "@/components/common/table/EditableTable";
 
 
-    const toggleEdit = (status) => {
-        setEditing(status);
-        form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-    };
+const CubridBrokerConfig = () => {
 
-    const save = async () => {
-        try {
-            const values = await form.validateFields();
-            toggleEdit(false);
-            handleSave({ ...record, ...values });
-        } catch (err) {
-            console.error('Save failed:', err);
-        }
-    };
-
-    let childNode = children;
-    const isEmpty = !children || (typeof children[0] === 'string' && children[0].trim() === '');
-        childNode = editing ? (
-            <Form.Item
-                style={{ margin: 0 }}
-                name={dataIndex}
-            >
-                <Input ref={inputRef} onPressEnter={save} onBlur={save} size="small" />
-            </Form.Item>
-        ) : (
-
-            <div
-                onClick={() => toggleEdit(true)}
-                style={{ minHeight: 24, padding: 0, cursor: 'pointer' }}
-            >
-                {isEmpty ? <span style={{ opacity: 0.4 }}>Click to edit</span> : children}
-            </div>
-        );
-
-
-    return <td {...restProps}>{childNode}</td>;
-};
-
-const EditableTable = () => {
-
-    const {contents, activePanel, unsavedPanels, signalSavePanel} = useSelector(state => state.general);
+    const {contents, activePanel, unsavedPanels, closePanelKey} = useSelector(state => state.general);
     const dispatch = useDispatch()
-    const [server, setServer] = useState({})
-    const {servers} = useSelector(state => state);
+    const {activeServer} = useSelector(state => state.treeReducer);
     const [columns, setColumns] = useState([]);
     const [dataSource, setDataSource] = useState([]);
     const [isChange, setIsChange] = useState(false);
+    const activeRef = useRef(null);
     let reserved = []
 
-    const handleChange = (value)=>{
-        setIsChange(true)
-
-    }
     useEffect(()=>{
         if(isChange){
             dispatch(setUnsavedPanels([...unsavedPanels, activePanel]))
         }
     },[isChange])
     useEffect(()=>{
-        const content = contents.find(res => res.key === activePanel)
-        const server = servers.find(res => res.serverId === content.serverId)
-        setServer(server);
+        activeRef.current = activePanel;
+        // const content = contents.find(res => res.key === activePanel)
+        // const server = servers.find(res => res.uid === content.uid)
+        // setServer(server);
+        getAllSystemParamAPI(activeServer, {confname: "cubrid_broker.conf"}).then(res=>{
+            if(res.success){
+                const data = extractParam(res.result)
+                // const cols = Object.keys(data[0]).map(col=>{
+                //     return {
+                //         key: nanoid(4),
+                //         title: col,
+                //         editable: true,
+                //         dataIndex: col.toLowerCase(),
+                //     }
+                // });
+
+                const cols = Object.keys(data[0]).map((col, index)=>{
+                    return {
+                        key: nanoid(4),
+                        title: `Broker#${index}`,
+                        editable: true,
+                        dataIndex: col.toLowerCase(),
+                    }
+                });
+                cols.unshift({
+                    key: nanoid(4),
+                    title: "Property Name",
+                    dataIndex: "propertyName",
+                })
+                const firstValue =
+                    { key: nanoid(4), propertyName: <b>BROKER_NAME</b>}
+                Object.keys(data[0]).forEach(col=>{
+                       firstValue[col.toLowerCase()] = <b>{`[${col.toLowerCase()}]`}</b>;
+                    });
+
+                setColumns(cols.map(col => ({
+                    ...col,
+                    onCell: col.editable
+                        ? (record) => ({
+                            record,
+                            editable: col.editable,
+                            dataIndex: col.dataIndex,
+                            title: col.title,
+                            handleSave,
+                        })
+                        : undefined,
+                })))
+                const values = [...data[1]].map(res=>{
+                    const brokers = Object.keys(data[0]).map(col=>{
+                        return {
+                            key: nanoid(4),
+                            [col]: data[0][col][res] ?? "",
+                        }
+                    })
+                    return {
+                        key: nanoid(4),
+                        propertyName: res,
+                        ...Object.assign({}, ...brokers)
+                    }
+                });
+                setDataSource([firstValue, ...values])
+                reserved = values;
+            }
+        })
         // getCubridBrokerConfig({...getAPIParam(server)}).then((res) => {
-        //     // if(res.status){
-        //     //     const data = extractParam(res.result.conflist[0].confdata)
-        //     //     const cols = Object.keys(data[0]).map(col=>{
-        //     //         return {
-        //     //             key: nanoid(4),
-        //     //             title: col,
-        //     //             editable: true,
-        //     //             dataIndex: col.toLowerCase(),
-        //     //         }
-        //     //     });
-        //     //     cols.unshift({
-        //     //         key: nanoid(4),
-        //     //         title: "Property Name",
-        //     //         dataIndex: "propertyName",
-        //     //     })
-        //     //     setColumns(cols.map(col => ({
-        //     //         ...col,
-        //     //         onCell: col.editable
-        //     //             ? (record) => ({
-        //     //                 record,
-        //     //                 editable: col.editable,
-        //     //                 dataIndex: col.dataIndex,
-        //     //                 title: col.title,
-        //     //                 handleSave,
-        //     //             })
-        //     //             : undefined,
-        //     //     })))
-        //     //
-        //     //     const values = [...data[1]].map(res=>{
-        //     //     const brokers = Object.keys(data[0]).map(col=>{
-        //     //             return {
-        //     //                 key: nanoid(4),
-        //     //                 [col]: data[0][col][res] ?? "",
-        //     //             }
-        //     //         })
-        //     //         return {
-        //     //             key: nanoid(4),
-        //     //             propertyName: res,
-        //     //             ...Object.assign({}, ...brokers)
-        //     //         }
-        //     //     });
-        //     //     setDataSource(values)
-        //     //     reserved = values;
-        //     // }
+        //     if(res.status){
+        //         const data = extractParam(res.result.conflist[0].confdata)
+        //         const cols = Object.keys(data[0]).map(col=>{
+        //             return {
+        //                 key: nanoid(4),
+        //                 title: col,
+        //                 editable: true,
+        //                 dataIndex: col.toLowerCase(),
+        //             }
+        //         });
+        //         cols.unshift({
+        //             key: nanoid(4),
+        //             title: "Property Name",
+        //             dataIndex: "propertyName",
+        //         })
+        //         setColumns(cols.map(col => ({
+        //             ...col,
+        //             onCell: col.editable
+        //                 ? (record) => ({
+        //                     record,
+        //                     editable: col.editable,
+        //                     dataIndex: col.dataIndex,
+        //                     title: col.title,
+        //                     handleSave,
+        //                 })
+        //                 : undefined,
+        //         })))
+        //
+        //         const values = [...data[1]].map(res=>{
+        //         const brokers = Object.keys(data[0]).map(col=>{
+        //                 return {
+        //                     key: nanoid(4),
+        //                     [col]: data[0][col][res] ?? "",
+        //                 }
+        //             })
+        //             return {
+        //                 key: nanoid(4),
+        //                 propertyName: res,
+        //                 ...Object.assign({}, ...brokers)
+        //             }
+        //         });
+        //         setDataSource(values)
+        //         reserved = values;
+        //     }
         //
         // })
     },[])
@@ -167,27 +161,27 @@ const EditableTable = () => {
 
     };
 
+
     useEffect(()=>{
-        if(signalSavePanel.includes(activePanel)){
+        if(closePanelKey === activeRef.current){
             ConfirmAction({
                 content: "Do you want to save changes?",
                 onOk: () => {
-                    // dispatch(setLoading(true))
-                    // const lines = injectParam(dataSource);
-                    // setCubridBrokerConfig({...getAPIParam(server), confdata: lines}).then(res =>{
-                    //     dispatch(setLoading(false))
-                    //     if(res.status) {
-                    //         removePanel()
-                    //     }
-                    // })
-
+                    dispatch(setLoading(true))
+                    const lines = injectParam(dataSource);
+                    setAllSystemParamAPI(activeServer, {confname: "cubrid_broker.conf", confdata: lines}).then(res =>{
+                        dispatch(setLoading(false))
+                        if(res.success) {
+                            removePanel()
+                        }
+                    })
                 },
                 onCancel: () => {
                     removePanel()
                 }
             })
         }
-    },[signalSavePanel])
+    },[closePanelKey])
 
     const removePanel = ()=>{
         if(contents.length > 1) {
@@ -195,26 +189,19 @@ const EditableTable = () => {
             dispatch(setActivePanel(activeKey));
         }
         dispatch(deleteContents(activePanel));
-        dispatch(deleteSignalSavePanel(activePanel));
+        dispatch(deleteUnsavedPanels(activePanel));
+        dispatch(setClosePanelKey(null));
     }
-    console.log(dataSource)
+
 
     return (
-        <Table
-            bordered
+
+
+        <EditableTable
             dataSource={dataSource}
             columns={columns}
-            rowClassName={(_, index) => (index % 2 === 0 ? 'striped' : '')}
-            pagination={false}
-            components={{
-                body: {
-                    row: EditableRow,
-                    cell: EditableCell,
-                },
-            }}
-            className="custom-table"
         />
     );
 };
 
-export default EditableTable;
+export default CubridBrokerConfig;
