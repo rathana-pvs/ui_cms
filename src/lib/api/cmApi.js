@@ -162,3 +162,39 @@ export const setAllSystemParamAPI = async (node, data) => {
     const response = await getResponse(node, payload)
     return {success: response.success}
 }
+
+export const stopDatabaseAPI = async (node, data) => {
+    let payload = {
+        task:"stopdb",
+        ...data
+    }
+    const response = await getResponse(node, payload)
+    return {success: response.success}
+}
+
+export const startDatabaseAPI = async (node, data) => {
+    let payload = {
+        task:"startdb",
+        ...data
+    }
+    const response = await getResponse(node, payload)
+    return {success: response.success}
+}
+
+export const startBrokerAPI = async (node, data) => {
+    let payload = {
+        task:"broker_start",
+        ...data
+    }
+    const response = await getResponse(node, payload)
+    return {success: response.success}
+}
+
+export const stopBrokerAPI = async (node, data) => {
+    let payload = {
+        task:"broker_stop",
+        ...data
+    }
+    const response = await getResponse(node, payload)
+    return {success: response.success}
+}

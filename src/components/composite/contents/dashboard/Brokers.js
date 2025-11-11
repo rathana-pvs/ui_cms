@@ -6,11 +6,67 @@ import styles from '@/components/composite/contents/dashboard/dashboard.module.c
 import { getBrokersAPI, getBrokerStatusAPI } from "@/lib/api/cmApi";
 import { getBrokerFormat } from "@/utils/navigation";
 import { getIntervalDashboard } from "@/preference/pref";
-
 const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Status', dataIndex: 'state', key: 'status' },
-    // ...other columns
+    {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name'
+    },
+    {
+        title: 'Status',
+        dataIndex: 'state',
+        key: 'status',
+    },
+    {
+        title: 'PID',
+        dataIndex: 'pid',
+        key: 'pid',
+    },
+    {
+        title: 'PORT',
+        key: 'port',
+        dataIndex: 'port'
+    },
+    {
+        title: 'AS',
+        key: 'as',
+        dataIndex: 'as'
+    },
+    {
+        title: 'JQ',
+        key: 'jq',
+        dataIndex: 'jq'
+    },
+    {
+        title: 'REQ',
+        dataIndex: 'req',
+        key: 'req',
+    },
+    {
+        title: 'TPS',
+        key: 'tps',
+        dataIndex: 'tps'
+    },
+    {
+        title: 'QPS',
+        key: 'qps',
+        dataIndex: 'qps'
+    },
+    {
+        title: 'LONG-T',
+        key: 'long_t',
+        dataIndex: 'long_tran_time',
+    },
+    {
+        title: 'LONG-Q',
+        dataIndex: 'long_query_time',
+        key: 'long_q',
+    },
+    {
+        title: 'EER-Q',
+        key: 'err_q',
+        dataIndex: 'error_query'
+    }
 ];
 
 export default function BrokerDashboard(props) {
@@ -35,6 +91,9 @@ export default function BrokerDashboard(props) {
             const dataSource = responses
                 .map((r, i) => {
                     if (!r.success) return null;
+                    if(!r.result){
+                        return newBrokers[i]
+                    }
                     const result = r.result[0];
                     return {
                         ...newBrokers[i],

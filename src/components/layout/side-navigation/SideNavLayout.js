@@ -121,6 +121,15 @@ export default function Vertical() {
         })
     };
 
+    const handleTreeRightClick = (e)=>{
+        const {node} = e;
+        menus.forEach((item) => {
+            if(item.type === node.type){
+                setMenu({...e, node, Screen: item.Screen,  open: true});
+            }
+        })
+    }
+
     const renderManu = ()=>{
         const {Screen, open, ...e} = menu
         if(Screen){
@@ -160,6 +169,7 @@ export default function Vertical() {
                             defaultExpandAll
                             showLine
                             showIcon
+                            onRightClick={handleTreeRightClick}
                             // selectedKeys={[selectedObject?.key]}
                             // loadData={loadData}
                             // onSelect={onSelect}

@@ -1,5 +1,6 @@
 import {nanoid} from "nanoid";
 import {setLocalStorage} from "@/utils/storage";
+import {getResponse} from "@/lib/api";
 
 
 export function isNotEmpty(value) {
@@ -163,37 +164,34 @@ export const setRememberPassword = (remember, serverId, connections)=>{
 // }
 //
 //
-// export const onStopDatabase = async (node, state, dispatch) => {
-//     dispatch(setLoading(true));
-//     const server = state.servers.find(res => res.serverId === node.serverId);
-//     const response = await axios.post("/api/stop-db", {
-//         ...getAPIParam(server),
-//         database: node.title,
-//     }).then(res => res.data)
-//     dispatch(setLoading(false));
-//     if (response.status) {
-//         const newDatabases = state.databases.map((item) => {
-//             if (item.key === node.key) {
-//                 const newObject = {...item,
-//                     status: "inactive",
-//                     icon: <i className={`fa-light fa-database warning`}/>,
-//                 };
-//                 dispatch(setSelectedObject(newObject))
-//                 return newObject
-//             }
-//             return item;
-//         })
-//
-//         dispatch(setDatabase(newDatabases));
-//
-//     }else{
-//         Modal.error({
-//             title: 'Database',
-//             content: response.note,
-//             okText: 'Close',
-//         });
-//     }
-// }
+export const onStopDatabase = async (node, activeServer, dispatch) => {
+    const response = getResponse(activeServer, {
+        task:"stopdb",
+        dbname: node.title,
+    }).then(res => res.data)
+    if (response.status) {
+        const newDatabases = state.databases.map((item) => {
+            if (item.key === node.key) {
+                const newObject = {...item,
+                    status: "inactive",
+                    icon: <i className={`fa-light fa-database warning`}/>,
+                };
+                dispatch(setSelectedObject(newObject))
+                return newObject
+            }
+            return item;
+        })
+
+        dispatch(setDatabase(newDatabases));
+
+    }else{
+        Modal.error({
+            title: 'Database',
+            content: response.note,
+            okText: 'Close',
+        });
+    }
+}
 //
 //
 // export const onStartService = async (node, dispatch) => {
