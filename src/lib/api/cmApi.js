@@ -198,3 +198,21 @@ export const stopBrokerAPI = async (node, data) => {
     const response = await getResponse(node, payload)
     return {success: response.success}
 }
+
+export const getDBUsersAPI = async (server, data) => {
+    let payload = {
+        task: "userinfo",
+        ...data
+    }
+    const response = await getResponse(server, payload)
+    return {result: response.user};
+}
+
+export const getDBSpaceAPI = async (server, data) => {
+    let payload = {
+        task: "dbspaceinfo",
+        ...data
+    }
+    const response = await getResponse(server, payload)
+    return {result: response};
+}

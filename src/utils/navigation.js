@@ -39,7 +39,6 @@ export const getServerFormat =(server)=>{
 }
 
 export const getDatabaseFormat =(item)=>{
-    console.log(item)
     return {
         ...item,
         // ...getTemplateFormat(node),

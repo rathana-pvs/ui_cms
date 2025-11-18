@@ -5,14 +5,14 @@ import {useDispatch, useSelector} from "react-redux";
 import {Tabs, Tree} from "antd";
 import TreeDatabase from "@/components/layout/side-navigation/tree-expand/TreeDatabase";
 import TreeBroker from "@/components/layout/side-navigation/tree-expand/TreeBroker";
-import {getBrokersAPI, getDatabasesAPI, getHostsAPI, revokeLogin} from "@/lib/api/cmApi";
-import {setActiveServer, setBrokers, setDatabases, setServers} from "@/store/treeReducer";
+import {getBrokersAPI, getDatabasesAPI, getDBSpaceAPI, getDBUsersAPI, getHostsAPI, revokeLogin} from "@/lib/api/cmApi";
+import {setActiveServer, setBrokers, setDatabases, setServers, setUsers} from "@/store/treeReducer";
 import {
     getBrokerFormat,
     getDatabaseFormat,
     getFileTemplateFormat, getFolderTemplateFormat,
     getServerFormat,
-    getTemplateFormat
+    getTemplateFormat, getUserFormat
 } from "@/utils/navigation";
 import {addContents, setActivePanel} from "@/store/generalReducer";
 import Dashboard from "@/components/composite/contents/dashboard/Dashboard";
@@ -33,6 +33,8 @@ import BrokerMenu from "@/components/composite/menus/BrokerMenu";
 import {nanoid} from "nanoid";
 import ServerCard from "@/components/composite/server/ServerCard";
 import {setLoading} from "@/store/dialogReducer";
+import {FolderIcon} from "@/components/common/icons";
+
 
 
 
@@ -81,7 +83,7 @@ export default function Vertical() {
     // const [activeServer, setActiveServer] = useState(null);
     const {contents} = useSelector(state=> state.general);
     const {user} = useSelector(state => state.auth);
-    const {servers, databases, brokers, activeServer} = useSelector((state) => state.treeReducer);
+    const {servers, databases, brokers, users, activeServer} = useSelector((state) => state.treeReducer);
     const [activeTree, setActiveTree] = useState(0)
     const [subLogger, setSubLogger] = useState([]);
     const [subBrokerLog, setSubBrokerLog] = useState([]);
@@ -89,7 +91,9 @@ export default function Vertical() {
     const [menu, setMenu] = useState({});
     const dispatch = useDispatch();
     const treeItems = ["DB", "Broker", "Log"]
-
+    const [subDatabase, setSubDatabase] = useState([]);
+    const [subDBSpace, setSubDBSpace] = useState([]);
+    const [spaceTreeFolder, setSpaceTreeFolder] = useState([])
 
     useEffect(() => {
         dispatch(setLoading(false));
@@ -141,7 +145,7 @@ export default function Vertical() {
 
     const getTreeData = ()=>{
         if(activeTree === 0){
-            return buildTree(databases)
+            return buildTree(databases, subDatabase, users, subDBSpace, spaceTreeFolder)
         }else if(activeTree === 1){
             return buildTree(brokers)
         }else if(activeTree === 2){
@@ -171,7 +175,7 @@ export default function Vertical() {
                             showIcon
                             onRightClick={handleTreeRightClick}
                             // selectedKeys={[selectedObject?.key]}
-                            // loadData={loadData}
+                            loadData={onLoadData}
                             // onSelect={onSelect}
                             switcherIcon={({expanded})=> {
                                 return expanded ? <i className="fa-regular fa-square-minus" />:<i className="fa-regular fa-square-plus"/>
@@ -214,6 +218,41 @@ export default function Vertical() {
                if(res.success){
                    const newDatabases = res.result?.map(item => getDatabaseFormat(item));
                    dispatch(setDatabases(newDatabases));
+                   const newSubDataBase = newDatabases.map(db=>{
+
+                       return [
+                           {
+                               ...getTemplateFormat(db),
+                               title: "Users",
+                               type: "users",
+                               isLeaf: false,
+                           },
+                           {
+                               ...getTemplateFormat(db),
+                               title: "Job Automation",
+                               sub: [
+                                   {
+                                       title: "Backup Plan",
+                                       key: nanoid(4),
+                                       icon: <FolderIcon/>
+                                   },
+                                   {
+                                       title: "Query Plan",
+                                       key: nanoid(4),
+                                       icon: <FolderIcon/>
+                                   }
+                               ]
+                           },
+                           {
+                               ...getTemplateFormat(db),
+                               title: "Database Space",
+                               type: "dbspace",
+                               isLeaf: false
+                           }
+                       ]
+                   })
+                   setSubDatabase(newSubDataBase.flat())
+
                }
            })
            getBrokersAPI(activeServer).then(res=>{
@@ -280,8 +319,104 @@ export default function Vertical() {
            ]
            setSubBrokerLog(newSubBrokerLog)
        }
+   }
+
+   const onLoadData = async (node) => {
+       switch (node.type) {
+           case "users": {
+
+               const database = databases.find(item => item.key === node.parentId)
+               const {result} = await getDBUsersAPI(activeServer, {dbname: database.title})
+               const newUser = result.map(item => getUserFormat(item, node))
+               dispatch(setUsers([...users, ...newUser]))
+               break;
+           }
+           case "dbspace": {
+               const database = databases.find(item => item.key === node.parentId)
+               const {result} = await getDBSpaceAPI(activeServer, {dbname: database.title})
+               const newSubDBSpace = [
+                               {
+                                   parentId: node.key,
+                                   title: "Permanent_PermanentData",
+                                   key: nanoid(4),
+                                   icon: <FolderIcon/>,
+
+                               },
+                               {
+                                   parentId: node.key,
+                                   title: "Permanent_TemporaryData",
+                                   key: nanoid(4),
+                                   icon: <FolderIcon/>,
+
+                               },
+                               {
+                                   parentId: node.key,
+                                   title: "Temporary_TemporaryData",
+                                   key: nanoid(4),
+                                   icon: <FolderIcon/>
+                               },
+                               {
+                                   parentId: node.key,
+                                   title: "Log",
+                                   key: nanoid(4),
+                                   icon: <FolderIcon/>
+                               }
+                           ]
+
+               setSubDBSpace([...subDBSpace, ...newSubDBSpace])
+               if(result){
+                   const trees = []
+                   const active = {
+                       title: "active",
+                       key: nanoid(4),
+                       parentId: newSubDBSpace[3].key,
+                       icon: <FolderIcon/>,
+                       sub: []
+                   }
+                   const archive = {
+                       title: "archive",
+                       key: nanoid(4),
+                       parentId: newSubDBSpace[3].key,
+                       icon: <FolderIcon/>,
+                       sub: []
+                   }
+                   result.spaceinfo.forEach(item => {
+                       switch(item.type){
+                           case "PERMANENT":{
+                               trees.push({
+                                   title: item.location,
+                                   key: nanoid(4),
+                                   parentId: newSubDBSpace[0].key,
+                               })
+                               break;
+                           }
+                           case "Active_log":{
+                               active.sub.push({
+                                   title: item.location,
+                                   key: nanoid(4),
+
+                               })
+                               break;
+                           }
+                           case "Archive_log":{
+                                archive.sub.push({
+                                    title: item.location,
+                                    key: nanoid(4),
+                                })
+                           }
+
+                       }
+                   })
+                   trees.push(active)
+                   trees.push(archive)
+                   setSpaceTreeFolder(trees)
+               }
+           }
+       }
 
    }
+
+
     return (
         <div
             style={{
@@ -316,3 +451,6 @@ export default function Vertical() {
         </div>
     );
 }
+
+
+

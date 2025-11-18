@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Form, Input, Modal, Select} from "antd";
+import {Form, Input, InputNumber, Modal, Select} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import {setDashboardConfig, setLoading} from "@/store/dialogReducer";
 import {getIntervalDashboard, setIntervalDashboard} from "@/preference/pref";
@@ -8,15 +8,19 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 const DashboardConfig = () => {
-    const {databases, users, servers} = useSelector(state=>state)
     const {dashboardConfig} = useSelector(state=>state.dialog)
-    const [database, setDatabase] = useState({})
+    const [value, setValue] = useState(0);
     const dispatch = useDispatch();
     const [form] = Form.useForm();
-    const {server} = dashboardConfig;
+
     const handleSave = () => {
-        setIntervalDashboard(form.getFieldValue("interval"))
+        let value = form.getFieldValue("interval")
+        if(parseInt(value)){
+            value = 0
+        }
+        setIntervalDashboard(value)
         handleClose()
+
     }
     const handleClose = () => {
         dispatch(setDashboardConfig({open: false}))
@@ -31,6 +35,7 @@ const DashboardConfig = () => {
 
     },[dashboardConfig.open])
 
+
     return (
         <Modal
             width={400}
@@ -44,9 +49,16 @@ const DashboardConfig = () => {
             <Form form={form} layout="vertical">
                 <Form.Item
                     name="interval"
-                    label="Interval (seconds)"
+                    label="Interval (seconds), 0 is no refresh"
+
+
                 >
-                    <Input type="number"/>
+                    <Input
+                        type="number"
+                        precision={0}           // <-- integers only
+                        style={{ width: "100%" }}
+                        min={0}
+                    />
                 </Form.Item>
             </Form>
         </Modal>

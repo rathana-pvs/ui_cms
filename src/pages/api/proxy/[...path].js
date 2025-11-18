@@ -4,7 +4,7 @@ import https from "https";
 export default async function handler(req, res) {
     const { method, headers, body } = req;
     const path = req.query.path.join("/");
-    const backendUrl = `https://192.168.2.36:8080/${path}`;
+    const backendUrl = `https://192.168.2.50:8080/${path}`;
     try {
         const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 

@@ -33,5 +33,9 @@ export const setIntervalDashboard = (value)=>{
 }
 
 export const getIntervalDashboard = ()=>{
-    return localStorage.getItem(prefIntervalDashboard);
+    let value = localStorage.getItem(prefIntervalDashboard);
+    if(value === null){
+        value = 10
+    }
+    return value
 }
