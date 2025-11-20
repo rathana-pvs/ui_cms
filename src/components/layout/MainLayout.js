@@ -16,6 +16,7 @@ import DashboardConfig from "@/components/common/modal/DashboardConfig";
 import ExportHost from "@/components/common/modal/ExportHost";
 import ImportHost from "@/components/common/modal/ImportHost";
 import LoadingScreen from "@/components/common/modal/LoadingScreen";
+import HorizontalResizeLayout from "@/components/common/resizable/ResizeHorizontal";
 // import AboutCubrid from "@/components/common/modal/AboutCubrid";
 // import Property from "@/components/common/modal/property/Property";
 // import NewConnection from "@/components/ui/dialogs/NewConnection";
@@ -65,6 +66,7 @@ export const MainLayout = (props)=>{
                 {/*<AppBar/>*/}
                 <Layout className={"main__container"}>
                     <SideNavigation/>
+                    {/*<HorizontalResizeLayout/>*/}
                     <main className="main__content">
                         {props.children}
                     </main>

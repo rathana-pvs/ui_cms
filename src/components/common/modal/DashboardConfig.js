@@ -50,8 +50,6 @@ const DashboardConfig = () => {
                 <Form.Item
                     name="interval"
                     label="Interval (seconds), 0 is no refresh"
-
-
                 >
                     <Input
                         type="number"

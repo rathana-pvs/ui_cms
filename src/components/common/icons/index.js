@@ -8,3 +8,7 @@ export const FolderIcon = ()=>{
 export const FolderGearIcon = ({status})=>{
     return <i className="fa-regular fa-folder-gear" style={{color:`${status ? '#B77466':'var(--color-yellow)'}`}}/>
 }
+
+export const FileIcon = ()=>{
+    return <i className="fa-regular fa-file"/>
+}

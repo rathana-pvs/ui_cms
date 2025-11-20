@@ -33,7 +33,9 @@ import BrokerMenu from "@/components/composite/menus/BrokerMenu";
 import {nanoid} from "nanoid";
 import ServerCard from "@/components/composite/server/ServerCard";
 import {setLoading} from "@/store/dialogReducer";
-import {FolderIcon} from "@/components/common/icons";
+import {FileIcon, FolderIcon} from "@/components/common/icons";
+import VolumeSpace from "@/components/composite/contents/space-db/VolumeSpace";
+
 
 
 
@@ -63,7 +65,8 @@ const panels = [
     {type: "broker_error_log", children: BrokerErrorLog},
     {type: "server_db_log", children: ServerErrorLog},
     {type: "brokers", children: BrokersStatus},
-    {type: "broker", children: BrokerStatus}
+    {type: "broker", children: BrokerStatus},
+    {type: "Volume info", children: VolumeSpace},
 ]
 
 const menus = [
@@ -181,6 +184,13 @@ export default function Vertical() {
                                 return expanded ? <i className="fa-regular fa-square-minus" />:<i className="fa-regular fa-square-plus"/>
                             }}
                             treeData={getTreeData()}
+                            titleRender={(node) => (
+                                <span
+                                    onDoubleClick={() => onDoubleClick(node)}
+                                >
+                            {node.title}
+                        </span>
+                            )}
 
                         />
                         {/*<Tabs*/}
@@ -226,10 +236,12 @@ export default function Vertical() {
                                title: "Users",
                                type: "users",
                                isLeaf: false,
+                               icon: <i className="fa-regular fa-users"></i>
                            },
                            {
                                ...getTemplateFormat(db),
                                title: "Job Automation",
+                               icon: <i className="fa-regular fa-clock"></i>,
                                sub: [
                                    {
                                        title: "Backup Plan",
@@ -247,6 +259,7 @@ export default function Vertical() {
                                ...getTemplateFormat(db),
                                title: "Database Space",
                                type: "dbspace",
+                               icon: <i className="fa-regular fa-server"></i>,
                                isLeaf: false
                            }
                        ]
@@ -365,6 +378,9 @@ export default function Vertical() {
 
                setSubDBSpace([...subDBSpace, ...newSubDBSpace])
                if(result){
+                   const editionProps ={
+                       pagesize: result.pagesize,
+                   }
                    const trees = []
                    const active = {
                        title: "active",
@@ -384,24 +400,42 @@ export default function Vertical() {
                        switch(item.type){
                            case "PERMANENT":{
                                trees.push({
-                                   title: item.location,
+                                   title: item.spacename.split("/").pop(),
                                    key: nanoid(4),
                                    parentId: newSubDBSpace[0].key,
+                                   isLeaf:true,
+                                   ...item,
+                                   ...editionProps,
+                                   type:"Volume info",
+                                   typeSpace: item.type,
+                                   icon: <FileIcon/>
                                })
                                break;
                            }
                            case "Active_log":{
                                active.sub.push({
-                                   title: item.location,
+                                   title: item.spacename,
                                    key: nanoid(4),
+                                   isLeaf: true,
+                                   ...item,
+                                   ...editionProps,
+                                   type:"Volume info",
+                                   typeSpace: item.type,
+                                   icon: <FileIcon/>
 
                                })
                                break;
                            }
                            case "Archive_log":{
                                 archive.sub.push({
-                                    title: item.location,
+                                    title: item.spacename,
                                     key: nanoid(4),
+                                    isLeaf: true,
+                                    ...item,
+                                    ...editionProps,
+                                    type:"Volume info",
+                                    typeSpace: item.type,
+                                    icon: <FileIcon/>
                                 })
                            }
 
@@ -415,14 +449,11 @@ export default function Vertical() {
        }
 
    }
-
-
     return (
         <div
             style={{
                 display: "flex",
                 flexDirection: "column",
-                height: "100vh",
             }}
         >
             {renderManu()}

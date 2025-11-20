@@ -273,7 +273,8 @@
 .ant-modal-body
 {
     font-weight: 500 !important;
-    font-size: 0.8125rem !important; /* 13px */
+    /*font-size: 0.8125rem !important; !* 13px *!*/
+    font-size: 0.78rem !important;
 }
 
 .ant-table-tbody>tr>td{

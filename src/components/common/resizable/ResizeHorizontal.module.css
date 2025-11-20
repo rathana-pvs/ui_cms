@@ -1,0 +1,13 @@
+
+.resize__horizontal__line{
+    width: 4px;
+    height: 100%;
+    background-color: var(--color-border);
+    opacity: 0.8;
+    cursor: col-resize;
+}
+.resize__horizontal__line:hover, .dragging{
+    background-color: var(--color-border);
+    opacity: 1;
+    transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}

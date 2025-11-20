@@ -446,7 +446,8 @@ body {
 
 .main__container {
     display: grid;
-    grid-template-columns: minmax(17.5rem, auto) 1fr; /* 280px */
+    /*grid-template-columns: minmax(17.5rem, auto) 1fr; !* 280px *!*/
+    grid-template-columns: auto 1fr; /* 280px */
     height: calc(100vh - 5.75rem); /* 92px */
 }
 
@@ -458,7 +459,8 @@ body {
     display: grid;
     grid-template-rows: 2.5rem auto; /* 40px */
     gap: 0.75rem; /* 12px */
-    max-width: 56.25rem; /* 900px */
+    /*max-width: 56.25rem; !* 900px *!*/
+    width: 100%;
 }
 
 .main__content {
